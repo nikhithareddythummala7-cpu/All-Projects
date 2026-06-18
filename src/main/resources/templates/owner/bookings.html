@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Bookings - Owner Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/owner.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/owner/bookings">
+                <i class="fas fa-utensils"></i> Restaurant Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/owner/bookings">
+                            <i class="fas fa-calendar-check"></i> Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/owner/tables">
+                            <i class="fas fa-chair"></i> Tables
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/owner/profile">
+                            <i class="fas fa-store"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/logout" method="post" class="d-inline">
+                            <button class="nav-link btn btn-link" type="submit">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header" style="margin-top: 2rem;">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-calendar-check"></i> Restaurant Bookings</h1>
+                    <p class="page-subtitle">Manage and track all incoming bookings</p>
+                </div>
+            </div>
+
+            <input type="hidden" id="restaurantId" th:value="${restaurant?.id}" />
+
+            <!-- Loading State -->
+            <div id="loading" class="text-center py-5">
+                <div class="spinner-border mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-white fs-5">Loading bookings...</p>
+            </div>
+
+            <!-- Bookings Container -->
+            <div id="bookings-container" style="display:none">
+                <!-- Error Alert -->
+                <div id="error-message" class="alert alert-danger" style="display:none"></div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by customer or table number...">
+                    <select id="statusFilter" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="CONFIRMED">Confirmed</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="CANCELLED">Cancelled</option>
+                    </select>
+                </div>
+
+                <!-- Bookings List -->
+                <div id="bookings-list"></div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="empty-state" style="display:none">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <h3 class="empty-state-title">No bookings found</h3>
+                    <p class="empty-state-text">Start exploring restaurants or check back later</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allBookings = [];
+        let filteredBookings = [];
+
+        function getJwtToken() {
+            let t = localStorage.getItem("jwtToken");
+            if (!t) {
+                const m = document.cookie.match(/(?:^|;)\s*jwt=([^;]+)/);
+                t = m ? m[1] : null;
+            }
+            return t;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = getJwtToken();
+            if (!token) { window.location.href = '/login'; return; }
+            const restId = document.getElementById('restaurantId').value;
+            if (restId) loadBookings(restId);
+            else { document.getElementById('loading').style.display = 'none'; showError('Restaurant ID not found'); }
+        });
+
+        async function loadBookings(restaurantId) {
+            try {
+                const token = getJwtToken();
+                const bRes = await fetch(`/api/restaurants/${restaurantId}/bookings`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+
+                if (!bRes.ok) {
+                    showError('Failed to load bookings');
+                    return;
+                }
+
+                allBookings = await bRes.json();
+                filteredBookings = allBookings;
+                displayBookings(filteredBookings);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('bookings-container').style.display = 'block';
+            } catch (err) {
+                console.error(err);
+                showError('Error loading bookings');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookings-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (!bookings.length) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = bookings.map(b => createBookingCard(b)).join('');
+        }
+
+        function formatTimeRange(startIso, endIso) {
+            try {
+                const s = new Date(startIso);
+                const e = new Date(endIso);
+                const dateOpt = { month: 'short', day: 'numeric', year: 'numeric' };
+                const timeOpt = { hour: '2-digit', minute: '2-digit' };
+                const dateStr = s.toLocaleDateString('en-US', dateOpt);
+                const timeStr = s.toLocaleTimeString('en-US', timeOpt) + ' - ' + e.toLocaleTimeString('en-US', timeOpt);
+                return dateStr + ' · ' + timeStr;
+            } catch (err) { return `${startIso} - ${endIso}`; }
+        }
+
+        function createBookingCard(booking) {
+            const start = booking.startTime || booking.bookingTime;
+            const end = booking.endTime || booking.bookingTime;
+            const badgeClass = getBadgeClass(booking.status);
+
+            return `
+                <div class="booking-card">
+                    <div class="booking-header">
+                        <div>
+                            <div class="booking-title">Booking #${(booking.id||'').substring(0, 8).toUpperCase()}</div>
+                            <span class="booking-badge ${badgeClass}">${booking.status || 'UNKNOWN'}</span>
+                        </div>
+                    </div>
+
+                    <div class="booking-info">
+                        <div class="booking-detail">
+                            <i class="fas fa-calendar"></i>
+                            <div class="booking-detail-text">
+                                <span class="booking-detail-label">Date & Time</span>
+                                <span class="booking-detail-value">${formatTimeRange(start, end)}</span>
+                            </div>
+                        </div>
+                        <div class="booking-detail">
+                            <i class="fas fa-users"></i>
+                            <div class="booking-detail-text">
+                                <span class="booking-detail-label">Guests</span>
+                                <span class="booking-detail-value">${booking.numberOfGuests} ${booking.numberOfGuests === 1 ? 'person' : 'people'}</span>
+                            </div>
+                        </div>
+                        <div class="booking-detail">
+                            <i class="fas fa-chair"></i>
+                            <div class="booking-detail-text">
+                                <span class="booking-detail-label">Table</span>
+                                <span class="booking-detail-value">Table ${booking.tableNumber}</span>
+                            </div>
+                        </div>
+                        <div class="booking-detail">
+                            <i class="fas fa-user"></i>
+                            <div class="booking-detail-text">
+                                <span class="booking-detail-label">Customer</span>
+                                <span class="booking-detail-value">${booking.customerName || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="booking-actions">
+                        ${booking.status === 'PENDING' ? `<button class="btn btn-success" onclick="confirmBooking('${booking.id}')"><i class="fas fa-check"></i> Confirm</button>` : ''}
+                        ${booking.status !== 'CANCELLED' ? `<button class="btn btn-danger" onclick="cancelBooking('${booking.id}')"><i class="fas fa-times"></i> Cancel</button>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getBadgeClass(status) {
+            if (!status) return 'pending';
+            switch (status.toUpperCase()) {
+                case 'CONFIRMED': return 'confirmed';
+                case 'PENDING': return 'pending';
+                case 'CANCELLED': return 'cancelled';
+                default: return 'pending';
+            }
+        }
+
+        async function confirmBooking(id) {
+            const token = getJwtToken();
+            try {
+                const res = await fetch(`/api/bookings/${id}/confirm`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    loadBookings(document.getElementById('restaurantId').value);
+                } else {
+                    showError('Failed to confirm booking');
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Error confirming booking');
+            }
+        }
+
+        async function cancelBooking(id) {
+            if (!confirm('Are you sure you want to cancel this booking?')) return;
+            
+            const token = getJwtToken();
+            try {
+                const res = await fetch(`/api/bookings/${id}/cancel`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    loadBookings(document.getElementById('restaurantId').value);
+                } else {
+                    showError('Failed to cancel booking');
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Error cancelling booking');
+            }
+        }
+
+        // Search and filter
+        document.getElementById('searchInput')?.addEventListener('input', applyFilters);
+        document.getElementById('statusFilter')?.addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            
+            filteredBookings = allBookings.filter(b => {
+                const matchesQ = !q || 
+                    (b.customerName && b.customerName.toLowerCase().includes(q)) || 
+                    (b.tableNumber && String(b.tableNumber).includes(q));
+                const matchesStatus = !status || (b.status && b.status.toUpperCase() === status.toUpperCase());
+                return matchesQ && matchesStatus;
+            });
+            
+            displayBookings(filteredBookings);
+        }
+    </script>
+</body>
+</html>

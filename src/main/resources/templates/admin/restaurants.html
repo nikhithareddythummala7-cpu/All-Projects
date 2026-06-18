@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Restaurants</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <h1 class="navbar-brand">
+                <i class="fas fa-shield-alt"></i> Admin Dashboard
+            </h1>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/bookings">
+                            <i class="fas fa-calendar-check"></i> Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/restaurants">
+                            <i class="fas fa-store"></i> Restaurants
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/logout" method="post" class="d-inline">
+                            <button class="nav-link btn btn-link" type="submit">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header" style="margin-top: 2rem;">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-store"></i> Restaurants</h1>
+                    <p class="page-subtitle">Verify and manage all restaurants</p>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${restaurants == null or restaurants.isEmpty()}" class="section-card">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <h3 class="empty-state-title">No restaurants found</h3>
+                    <p class="empty-state-text">All restaurants will appear here</p>
+                </div>
+            </div>
+
+            <!-- Restaurants Table -->
+            <div th:if="${restaurants != null and !restaurants.isEmpty()}" class="section-card">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th><i class="fas fa-store"></i> Name</th>
+                            <th><i class="fas fa-map-marker-alt"></i> Address</th>
+                            <th><i class="fas fa-user"></i> Owner Email</th>
+                            <th><i class="fas fa-check-circle"></i> Verified</th>
+                            <th><i class="fas fa-toggle-on"></i> Active</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="restaurant : ${restaurants}">
+                            <td th:text="${restaurant.name}">Name</td>
+                            <td th:text="${restaurant.address}">Address</td>
+                            <td th:text="${restaurant.ownerEmail}">Owner Email</td>
+                            <td>
+                                <span th:if="${restaurant.verified}" class="badge status-verified">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                                <span th:if="not ${restaurant.verified}" class="badge status-pending-verify">
+                                    <i class="fas fa-hourglass-half"></i> Pending
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${restaurant.active}" class="badge status-yes">
+                                    <i class="fas fa-toggle-on"></i> Active
+                                </span>
+                                <span th:if="not ${restaurant.active}" class="badge status-no">
+                                    <i class="fas fa-toggle-off"></i> Inactive
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-cell">
+                                    <form th:action="@{'/admin/restaurants/' + ${restaurant.id} + '/approve'}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-success btn-sm" th:disabled="${restaurant.verified}">
+                                            <i class="fas fa-check"></i> Approve
+                                        </button>
+                                    </form>
+                                    <form th:action="@{'/admin/restaurants/' + ${restaurant.id} + '/reject'}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-times"></i> Reject
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

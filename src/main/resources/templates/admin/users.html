@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Users</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="/css/style.css" rel="stylesheet">
+    <link href="/css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <h1 class="navbar-brand">
+                <i class="fas fa-shield-alt"></i> Admin Dashboard
+            </h1>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/bookings">
+                            <i class="fas fa-calendar-check"></i> Bookings
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/restaurants">
+                            <i class="fas fa-store"></i> Restaurants
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/users">
+                            <i class="fas fa-users"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form action="/logout" method="post" class="d-inline">
+                            <button class="nav-link btn btn-link" type="submit">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header" style="margin-top: 2rem;">
+                <div>
+                    <h1 class="page-title"><i class="fas fa-users"></i> Users</h1>
+                    <p class="page-subtitle">Manage all registered users</p>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${users == null or users.isEmpty()}" class="section-card">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="empty-state-title">No users found</h3>
+                    <p class="empty-state-text">All users will appear here</p>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div th:if="${users != null and !users.isEmpty()}" class="section-card">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th><i class="fas fa-user"></i> Username</th>
+                            <th><i class="fas fa-envelope"></i> Email</th>
+                            <th><i class="fas fa-id-card"></i> Full Name</th>
+                            <th><i class="fas fa-badge"></i> Role</th>
+                            <th><i class="fas fa-check-circle"></i> Verified</th>
+                            <th><i class="fas fa-cog"></i> Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.username}">Username</td>
+                            <td th:text="${user.email}">Email</td>
+                            <td th:text="${user.firstName + ' ' + user.lastName}">Full Name</td>
+                            <td>
+                                <span th:if="${user.role == 'CUSTOMER'}" class="badge" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                                    <i class="fas fa-user-circle"></i> [[${user.role}]]
+                                </span>
+                                <span th:if="${user.role == 'OWNER'}" class="badge" style="background: linear-gradient(135deg, #f39c12, #e67e22); color: white;">
+                                    <i class="fas fa-store"></i> [[${user.role}]]
+                                </span>
+                                <span th:if="${user.role == 'ADMIN'}" class="badge" style="background: linear-gradient(135deg, #e74c3c, #c0392b); color: white;">
+                                    <i class="fas fa-shield-alt"></i> [[${user.role}]]
+                                </span>
+                            </td>
+                            <td>
+                                <span th:if="${user.accountVerified}" class="badge status-verified">
+                                    <i class="fas fa-check-circle"></i> Verified
+                                </span>
+                                <span th:if="not ${user.accountVerified}" class="badge status-pending-verify">
+                                    <i class="fas fa-hourglass-half"></i> Pending
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-cell">
+                                    <form th:action="@{'/admin/users/' + ${user.id} + '/delete'}" method="post" 
+                                          onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.');"
+                                          class="d-inline">
+                                        <button type="submit" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

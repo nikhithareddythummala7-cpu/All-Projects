@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Showcase - Table Booking</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-design.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-buttons.css}">
+    <style>
+        .showcase-section {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .showcase-section h2 {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #007bff;
+        }
+        
+        .button-showcase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            align-items: center;
+        }
+        
+        .code-block {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="nav-container">
+            <h1>🎨 Modern Button Showcase</h1>
+            <div class="nav-links">
+                <a href="/">Home</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Modern Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-star"></i> Modern Buttons</h2>
+            <p>Sleek, gradient-based buttons with smooth animations and hover effects.</p>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-primary">Primary</button>
+                <button class="btn-modern btn-modern-success">Success</button>
+                <button class="btn-modern btn-modern-danger">Delete</button>
+                <button class="btn-modern btn-modern-warning">Warning</button>
+                <button class="btn-modern btn-modern-info">Info</button>
+                <button class="btn-modern btn-modern-primary" disabled>Disabled</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-modern btn-modern-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="btn-modern btn-modern-success"&gt;Success&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Ghost Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-wind"></i> Ghost/Outline Buttons</h2>
+            <p>Transparent buttons with colored borders - perfect for secondary actions.</p>
+            <div class="button-showcase">
+                <button class="btn-ghost btn-ghost-primary">Primary</button>
+                <button class="btn-ghost btn-ghost-success">Success</button>
+                <button class="btn-ghost btn-ghost-danger">Danger</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-ghost btn-ghost-primary"&gt;Primary&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Pill Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-circle"></i> Pill Buttons</h2>
+            <p>Rounded buttons that scale up on hover with a playful animation.</p>
+            <div class="button-showcase">
+                <button class="btn-pill btn-pill-primary">Book Table</button>
+                <button class="btn-pill btn-pill-success">Confirm</button>
+                <button class="btn-pill btn-pill-danger">Cancel</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-pill btn-pill-primary"&gt;Book Table&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Animated Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-magic"></i> Animated Buttons</h2>
+            <p>Buttons with ripple animation effect on click.</p>
+            <div class="button-showcase">
+                <button class="btn-animated">Click Me</button>
+                <button class="btn-animated btn-animated-success">Success</button>
+                <button class="btn-animated btn-animated-danger">Delete</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-animated"&gt;Click Me&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Icon Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-icons"></i> Icon Buttons</h2>
+            <p>Circular buttons perfect for icon-only actions.</p>
+            <div class="button-showcase">
+                <button class="btn-icon btn-icon"><i class="fas fa-check"></i></button>
+                <button class="btn-icon btn-icon-success"><i class="fas fa-heart"></i></button>
+                <button class="btn-icon btn-icon-danger"><i class="fas fa-trash"></i></button>
+                <button class="btn-icon btn-icon-info"><i class="fas fa-share"></i></button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-icon btn-icon"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt;&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Flat Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-layer-group"></i> Flat Buttons</h2>
+            <p>Minimal buttons with subtle background on hover.</p>
+            <div class="button-showcase">
+                <button class="btn-flat btn-flat-primary">Primary</button>
+                <button class="btn-flat btn-flat-success">Success</button>
+                <button class="btn-flat btn-flat-danger">Delete</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-flat btn-flat-primary"&gt;Primary&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Size Variants -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-expand"></i> Size Variants</h2>
+            <p>Buttons in different sizes for various use cases.</p>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-primary btn-sm">Small</button>
+                <button class="btn-modern btn-modern-primary">Regular</button>
+                <button class="btn-modern btn-modern-primary btn-lg">Large</button>
+                <button class="btn-modern btn-modern-primary btn-xl">Extra Large</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-modern btn-modern-primary btn-sm"&gt;Small&lt;/button&gt;
+&lt;button class="btn-modern btn-modern-primary btn-lg"&gt;Large&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Buttons with Icons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-puzzle-piece"></i> Buttons with Icons</h2>
+            <p>Combine buttons with Font Awesome icons for better visual communication.</p>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-primary btn-with-icon">
+                    <i class="fas fa-plus"></i> Add Restaurant
+                </button>
+                <button class="btn-modern btn-modern-success btn-with-icon">
+                    <i class="fas fa-calendar"></i> Book Table
+                </button>
+                <button class="btn-modern btn-modern-danger btn-with-icon">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+                <button class="btn-modern btn-modern-info btn-with-icon">
+                    <i class="fas fa-download"></i> Download
+                </button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-modern btn-modern-primary btn-with-icon"&gt;
+    &lt;i class="fas fa-plus"&gt;&lt;/i&gt; Add Restaurant
+&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Button Groups -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-bars"></i> Button Groups</h2>
+            <p>Multiple buttons grouped together for related actions.</p>
+            <div class="button-showcase">
+                <div class="btn-group">
+                    <button class="btn-modern btn-modern-primary">Save</button>
+                    <button class="btn-modern btn-modern-warning">Edit</button>
+                    <button class="btn-modern btn-modern-danger">Delete</button>
+                </div>
+            </div>
+            <div class="code-block">
+&lt;div class="btn-group"&gt;
+    &lt;button class="btn-modern btn-modern-primary"&gt;Save&lt;/button&gt;
+    &lt;button class="btn-modern btn-modern-warning"&gt;Edit&lt;/button&gt;
+&lt;/div&gt;
+            </div>
+        </div>
+
+        <!-- Glass Morphism Buttons -->
+        <div class="showcase-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h2 style="color: white; border-bottom-color: white;"><i class="fas fa-gem"></i> Glass Morphism Buttons</h2>
+            <p style="color: rgba(255, 255, 255, 0.9);">Frosted glass effect buttons - modern and trendy.</p>
+            <div class="button-showcase">
+                <button class="btn-glass">Explore</button>
+                <button class="btn-glass">Discover</button>
+                <button class="btn-glass">Premium</button>
+            </div>
+            <div class="code-block" style="background: rgba(0, 0, 0, 0.2); border-left-color: white; color: white;">
+&lt;button class="btn-glass"&gt;Explore&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Block Buttons (Full Width) -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-arrows-alt-h"></i> Block Buttons</h2>
+            <p>Full-width buttons for forms and important actions.</p>
+            <button class="btn-modern btn-modern-primary btn-block" style="margin-bottom: 1rem;">
+                <i class="fas fa-sign-in-alt"></i> Login to Your Account
+            </button>
+            <button class="btn-modern btn-modern-success btn-block">
+                <i class="fas fa-user-plus"></i> Create New Account
+            </button>
+            <div class="code-block">
+&lt;button class="btn-modern btn-modern-primary btn-block"&gt;Login&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Compact Buttons -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-compress"></i> Compact Buttons</h2>
+            <p>Small, space-efficient buttons for tables and lists.</p>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-primary btn-compact">Edit</button>
+                <button class="btn-modern btn-modern-info btn-compact">View</button>
+                <button class="btn-modern btn-modern-danger btn-compact">Remove</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-modern btn-modern-primary btn-compact"&gt;Edit&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- States -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-state-machine"></i> Button States</h2>
+            <p>Different button states for various interactions.</p>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-primary">Normal</button>
+                <button class="btn-modern btn-modern-primary" disabled>Disabled</button>
+                <button class="btn-modern btn-modern-primary btn-loading">Loading</button>
+            </div>
+            <div class="code-block">
+&lt;button class="btn-modern btn-modern-primary" disabled&gt;Disabled&lt;/button&gt;
+&lt;button class="btn-modern btn-modern-primary btn-loading"&gt;Loading&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Real World Examples -->
+        <div class="showcase-section">
+            <h2><i class="fas fa-rocket"></i> Real World Examples</h2>
+            <p>How to use buttons in actual application scenarios.</p>
+            
+            <h4 style="margin-top: 1.5rem;">Restaurant Booking Form</h4>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-primary btn-lg btn-with-icon">
+                    <i class="fas fa-calendar-alt"></i> Book This Table
+                </button>
+                <button class="btn-ghost btn-ghost-primary">More Info</button>
+            </div>
+
+            <h4 style="margin-top: 1.5rem;">Admin Action Buttons</h4>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-success btn-with-icon">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn-modern btn-modern-warning btn-with-icon">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-modern btn-modern-danger btn-with-icon">
+                    <i class="fas fa-ban"></i> Reject
+                </button>
+            </div>
+
+            <h4 style="margin-top: 1.5rem;">Form Submission</h4>
+            <div class="button-showcase">
+                <button class="btn-modern btn-modern-success btn-lg">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="btn-ghost btn-ghost-danger">Cancel</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Table Booking App - Modern UI Design</p>
+    </footer>
+
+    <script>
+        // Add loading state demo
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-loading')) {
+                e.target.disabled = true;
+                setTimeout(() => {
+                    e.target.disabled = false;
+                    e.target.classList.remove('btn-loading');
+                    e.target.textContent = 'Completed!';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

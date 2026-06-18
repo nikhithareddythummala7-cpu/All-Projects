@@ -1,0 +1,12 @@
+{
+  "name": "Gourmet Paradise",
+  "description": "Fine dining with a view",
+  "cuisineType": "INTERNATIONAL",
+  "openingTime": "10:00",
+  "closingTime": "23:00",
+  "address": "123 Food Street, Cuisine City",
+  "contactNumber": "+1234567890",
+  "email": "info@gourmetparadise.com",
+  "capacity": 100,
+  "imageUrl": "https://example.com/restaurant.jpg"
+}

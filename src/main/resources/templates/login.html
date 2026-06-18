@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/modern-design.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-buttons.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .login-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+        
+        .login-header h1 {
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .login-header p {
+            margin: 0.5rem 0 0;
+            opacity: 0.95;
+            font-size: 0.95rem;
+        }
+        
+        .login-body {
+            padding: 2.5rem 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: flex;
+            align-items: center;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #212529;
+        }
+        
+        .form-group label i {
+            margin-right: 0.5rem;
+            color: #007bff;
+            font-size: 1.1rem;
+        }
+        
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        
+        .login-button {
+            width: 100%;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .login-footer {
+            text-align: center;
+            padding: 1.5rem 2rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .login-footer p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+        
+        .login-footer a {
+            color: #007bff;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .login-footer a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link a:hover {
+            transform: translateX(-4px);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-utensils"></i> Table Booking</h1>
+            <p>Welcome Back!</p>
+        </div>
+        
+        <div class="login-body">
+            <div th:if="${param.error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> Invalid username or password.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> You have been logged out successfully.
+            </div>
+            <div th:if="${param.registration}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i> Registration successful! Please login.
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required/>
+                </div>
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required/>
+                </div>
+                <button type="submit" class="btn-modern btn-modern-primary login-button btn-with-icon">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+        </div>
+        
+        <div class="login-footer">
+            <p>Don't have an account? <a href="/register">Create one now</a></p>
+        </div>
+    </div>
+    
+    <div class="back-link">
+        <a href="/">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        console.log('Login script loaded');
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Form submit prevented - AJAX will handle this');
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            console.log('Attempting authentication for:', email);
+
+            try {
+                // Send authentication request as JSON
+                const authResponse = await fetch('/authenticate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const authData = await authResponse.json();
+                console.log('Authenticate response received:', authData);
+
+                if (!authData.jwt) {
+                    // Show error message for invalid credentials or unverified accounts
+                    console.error('No JWT in response:', authData.message);
+                    alert(authData.message || 'Login failed');
+                    return;
+                }
+
+                console.log('Auth success');
+                // Store JWT token in localStorage
+                localStorage.setItem('jwtToken', authData.jwt);
+                console.log('JWT stored in localStorage');
+
+                // Also store in cookie for server-side authentication
+                document.cookie = 'jwt=' + authData.jwt + '; path=/; max-age=3600'; // 1 hour expiry
+                console.log('JWT stored in cookie');
+
+                // Get user role
+                console.log('Fetching user role...');
+                const roleResponse = await fetch('/api/user/role', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + authData.jwt
+                    }
+                });
+
+                const roleData = await roleResponse.json();
+                console.log('Role response received:', roleData);
+
+                if (roleData.error) {
+                    console.error('Error in role response:', roleData.error);
+                    alert('Error getting user role: ' + roleData.error);
+                    return;
+                }
+
+                console.log('Role fetched');
+                // Redirect based on role
+                const role = roleData.role;
+                console.log('User role:', role, '- Redirecting...');
+
+                switch(role) {
+                    case 'ADMIN':
+                        console.log('Redirecting to /admin/dashboard');
+                        window.location.href = '/admin/dashboard';
+                        break;
+                    case 'RESTAURANT_OWNER':
+                        console.log('Checking if owner has restaurant...');
+                        // Check if owner has restaurant
+                        const restaurantResponse = await fetch('/api/user/has-restaurant', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': 'Bearer ' + authData.jwt
+                            }
+                        });
+                        const restaurantData = await restaurantResponse.json();
+                        if (restaurantData.hasRestaurant) {
+                            console.log('Owner has restaurant, redirecting to /owner/dashboard');
+                            window.location.href = '/owner/dashboard';
+                        } else {
+                            console.log('Owner has no restaurant, redirecting to /restaurant/add');
+                            window.location.href = '/restaurant/add';
+                        }
+                        break;
+                    case 'CUSTOMER':
+                        console.log('Redirecting to /customer/dashboard');
+                        window.location.href = '/customer/dashboard';
+                        break;
+                    default:
+                        console.error('Unknown user role:', role);
+                        alert('Unknown user role: ' + role);
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('An error occurred during login. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>

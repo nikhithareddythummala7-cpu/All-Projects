@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${restaurant.name} + ' - Table Booking'">Restaurant Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <style>
+        body {
+            background: #f4f4f4;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: #007bff;
+            padding: 15px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .nav-container h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        .nav-links a {
+            margin: 0 8px;
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .restaurant-details {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .restaurant-header {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .restaurant-image img {
+            width: 100%;
+            max-width: 550px;
+            border-radius: 10px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .restaurant-info {
+            max-width: 400px;
+        }
+
+        .restaurant-info h2 {
+            margin-bottom: 5px;
+            font-size: 28px;
+        }
+
+        .rating {
+            margin: 10px 0;
+            font-size: 20px;
+            color: #ffa500;
+        }
+
+        .price-range span {
+            font-size: 18px;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .contact-info p {
+            margin: 4px 0;
+        }
+
+        .table-grid {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .table-card {
+            background: #ffffff;
+            padding: 18px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        .table-card h4 {
+            margin-bottom: 10px;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            padding: 8px 14px;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background: #007bff;
+            color: white;
+            margin-top: 40px;
+        }
+
+        /* Override global white text for this page */
+        .restaurant-details,
+        .restaurant-details p,
+        .restaurant-details h2,
+        .restaurant-details h3,
+        .restaurant-details h4,
+        .restaurant-details span,
+        .restaurant-info,
+        .restaurant-info p,
+        .restaurant-info h2,
+        .restaurant-info h3,
+        .contact-info,
+        .contact-info p {
+            color: #000 !important;
+            text-shadow: none !important;
+        }
+
+        .restaurant-details h2,
+        .restaurant-info h2 {
+            color: #212529 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <nav>
+        <div class="nav-container">
+            <h1>Table Booking</h1>
+            <div class="nav-links">
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/restaurants}">Restaurants</a>
+                <a th:href="@{/dashboard}">Dashboard</a>
+                <a th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main>
+<section class="restaurant-details">
+
+    <div class="restaurant-header">
+
+        <div class="restaurant-image">
+            <img th:src="${restaurant.images != null and !restaurant.images.isEmpty() 
+                ? restaurant.images.get(0) 
+                : '/images/default-restaurant.jpg'}"
+                alt="Restaurant Image">
+        </div>
+
+        <div class="restaurant-info">
+            <h2 th:text="${restaurant.name}">Restaurant Name</h2>
+
+            <p class="cuisineType" th:text="${restaurant.cuisineType}">Cuisine</p>
+
+            <p class="address" th:text="${restaurant.address}">Address</p>
+
+            <div class="rating">
+                <span class="stars"
+                      th:text="${#strings.repeat('★', restaurant.averageRating != null ? restaurant.averageRating.intValue() : 0)
+                          + #strings.repeat('☆', 5 - (restaurant.averageRating != null ? restaurant.averageRating.intValue() : 0))}">
+                </span>
+
+                <span th:text="${restaurant.averageRating != null ? restaurant.averageRating : 0}">0</span>
+            </div>
+
+            <div class="price-range">
+                <span th:text="${#strings.repeat('$', restaurant.priceRange != null ? restaurant.priceRange : 0)}"></span>
+            </div>
+
+            <div class="contact-info">
+                <p><strong>Phone:</strong> <span th:text="${restaurant.phoneNumber}">Phone</span></p>
+                <p><strong>Email:</strong> <span th:text="${restaurant.ownerEmail}">Email</span></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLE LIST -->
+    <div class="table-grid">
+        <div th:each="table : ${tables}" class="table-card">
+
+            <h4>Table #<span th:text="${table.tableNumber}">1</span></h4>
+
+            <p>Capacity: <span th:text="${table.capacity}">4</span> people</p>
+
+            <p>Status: <span th:text="${table.status}">AVAILABLE</span></p>
+
+            <!-- FIXED BUTTON -->
+            <button type="button" class="btn-primary"
+                    th:attr="data-table-id=${table.id},
+                             data-capacity=${table.capacity},
+                             data-status=${table.status}"
+                    onclick="openBookingForm(this)">
+                Book Now
+            </button>
+
+        </div>
+    </div>
+
+    <!-- BOOKING FORM -->
+    <div id="booking-form-container" style="display: none; margin-top: 40px; background: #f9f9f9; padding: 20px; border-radius: 8px;">
+        <h3>Book Table</h3>
+        <form id="booking-form">
+            <input type="hidden" id="selected-table-id" name="tableId">
+            <input type="hidden" id="restaurant-id" name="restaurantId" th:value="${restaurant.id}">
+
+            <div style="margin-bottom: 10px;">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="time">Time:</label>
+                <input type="time" id="time" name="time" required>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="guests">Number of Guests:</label>
+                <input type="number" id="guests" name="guests" min="1" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Confirm Booking</button>
+            <button type="button" onclick="cancelBookingForm()" style="margin-left: 10px; background: #6c757d;">Cancel</button>
+        </form>
+    </div>
+
+</section>
+</main>
+
+<footer>
+    <p>&copy; 2025 Table Booking. All rights reserved.</p>
+</footer>
+
+<script th:src="@{/js/main.js}"></script>
+<script th:src="@{/js/booking.js}"></script>
+</body>
+</html>

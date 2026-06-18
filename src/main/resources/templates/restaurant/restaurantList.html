@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore Restaurants - Table Booking</title>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Modern Design System -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-design.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-buttons.css}">
+    
+</head>
+
+<body>
+
+<header>
+    <nav>
+        <div class="nav-container">
+            <h1><i class="fas fa-utensils"></i> Table Booking</h1>
+            <div class="nav-links">
+                <a href="/"><i class="fas fa-home"></i> Home</a>
+                <a href="/customer/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="restaurant-list">
+        <h2><i class="fas fa-utensils"></i> Discover Restaurants</h2>
+        <p>Find and book your favorite restaurants with ease</p>
+
+        <!-- Search & Filter Section -->
+        <div class="search-filter">
+            <div>
+                <input type="text" placeholder="Search restaurants by name..." id="searchInput">
+                <select id="cuisineFilter">
+                    <option value="">All Cuisines</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Mexican">Mexican</option>
+                    <option value="Indian">Indian</option>
+                    <option value="American">American</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Thai">Thai</option>
+                    <option value="French">French</option>
+                </select>
+                <select id="priceFilter">
+                    <option value="">Any Price</option>
+                    <option value="1">$ - Budget</option>
+                    <option value="2">$$ - Moderate</option>
+                    <option value="3">$$$ - Expensive</option>
+                    <option value="4">$$$$ - Luxury</option>
+                </select>
+                <button onclick="filterRestaurants()"><i class="fas fa-filter"></i> Filter</button>
+            </div>
+        </div>
+
+        <!-- Restaurant Cards Grid -->
+        <div class="restaurant-grid" id="restaurantGrid">
+
+            <div th:each="restaurant : ${restaurants}" class="restaurant-card">
+
+                <!-- RESTAURANT IMAGE -->
+                <div class="restaurant-image">
+                    <img th:src="${restaurant.images != null and !restaurant.images.isEmpty() 
+                                  ? restaurant.images[0] 
+                                  : '/images/default-restaurant.jpg'}"
+                         alt="Restaurant Image">
+                    <div class="image-badge">
+                        <i class="fas fa-star"></i>
+                        <span th:text="${restaurant.averageRating}"></span>
+                    </div>
+                </div>
+
+                <!-- RESTAURANT INFO -->
+                <div class="restaurant-info">
+
+                    <h3 th:text="${restaurant.name}"></h3>
+
+                    <p class="cuisine" th:text="${restaurant.cuisineType}"></p>
+
+                    <p class="address"><i class="fas fa-map-marker-alt"></i> <span th:text="${restaurant.address}"></span></p>
+
+                    <!-- RATING -->
+                    <div class="rating">
+                        <span class="stars">
+                            <span th:each="i : ${#numbers.sequence(1, restaurant.averageRating.intValue())}">★</span>
+                            <span th:each="i : ${#numbers.sequence(restaurant.averageRating.intValue() + 1, 5)}">☆</span>
+                        </span>
+                        <span th:text="${'(' + restaurant.averageRating + ')'}"></span>
+                    </div>
+
+                    <!-- PRICE RANGE -->
+                    <div class="price-range">
+                        <span th:each="i : ${#numbers.sequence(1, restaurant.priceRange)}">$</span>
+                    </div>
+
+                    <!-- VIEW DETAILS BUTTON -->
+                    <a th:href="@{/restaurants/{id}(id=${restaurant.id})}" 
+                       class="btn-primary">
+                       <i class="fas fa-arrow-right"></i> View Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p><i class="fas fa-copyright"></i> 2025 Table Booking. All rights reserved.</p>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let allRestaurants = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Store restaurant cards for filtering
+        allRestaurants = Array.from(document.querySelectorAll('.restaurant-card')).map((el, index) => ({
+            name: el.querySelector('h3').textContent,
+            cuisine: el.querySelector('.cuisine').textContent,
+            price: el.querySelector('.price-range span:last-child') ? 
+                   el.querySelector('.price-range').children.length : 0,
+            element: el
+        }));
+    });
+
+    function filterRestaurants() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const cuisineFilter = document.getElementById('cuisineFilter').value.toLowerCase();
+        const priceFilter = document.getElementById('priceFilter').value;
+
+        allRestaurants.forEach(restaurant => {
+            const matchesSearch = restaurant.name.toLowerCase().includes(searchTerm);
+            const matchesCuisine = !cuisineFilter || restaurant.cuisine.toLowerCase().includes(cuisineFilter);
+            const matchesPrice = !priceFilter || restaurant.price == priceFilter;
+
+            if (matchesSearch && matchesCuisine && matchesPrice) {
+                restaurant.element.style.display = '';
+            } else {
+                restaurant.element.style.display = 'none';
+            }
+        });
+    }
+
+    // Real-time filtering as user types
+    document.getElementById('searchInput').addEventListener('keyup', filterRestaurants);
+    document.getElementById('cuisineFilter').addEventListener('change', filterRestaurants);
+    document.getElementById('priceFilter').addEventListener('change', filterRestaurants);
+</script>
+
+</body>
+</html>

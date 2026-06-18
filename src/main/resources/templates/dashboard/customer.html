@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - Table Booking</title>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Modern Design System -->
+    <link rel="stylesheet" th:href="@{/css/modern-design.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-buttons.css}">
+
+    <!-- Customer Dashboard CSS -->
+    <link rel="stylesheet" th:href="@{/css/customer.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="dashboard-navbar">
+        <div class="container-xl">
+            <div class="navbar-content">
+                <a class="navbar-brand" href="/customer/dashboard">
+                    <i class="fas fa-utensils"></i> Table Booking
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/customer/dashboard">
+                                <i class="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/restaurants/view}">
+                                <i class="fas fa-search"></i> Find Restaurants
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/bookings/my">
+                                <i class="fas fa-calendar"></i> My Bookings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/customer/profile">
+                                <i class="fas fa-user"></i> Profile
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <form th:action="@{/logout}" method="post" class="d-inline">
+                                <button class="nav-link btn-logout" type="submit">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- Hero Section -->
+    <section class="dashboard-hero">
+        <div class="hero-overlay"></div>
+        <div class="container-xl">
+            <div class="hero-content">
+                <h1 class="hero-title">Welcome to Your Dining Hub 🍽️</h1>
+                <p class="hero-subtitle">Discover amazing restaurants, make reservations, and enjoy memorable experiences</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Stats Section -->
+    <section class="quick-stats-section">
+        <div class="container-xl">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-bookings">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-favorites">0</h3>
+                        <p>Favorite Restaurants</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-rating">0</h3>
+                        <p>Avg Rating Given</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="stat-cuisine">N/A</h3>
+                        <p>Favorite Cuisine</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container-xl dashboard-container">
+
+        <!-- Loading State -->
+        <div id="loading" class="loading-container">
+            <div class="spinner-custom"></div>
+            <p>Loading your personalized dashboard...</p>
+        </div>
+
+        <!-- Dashboard Content with Sidebars -->
+        <div id="dashboard-content" style="display:none;">
+            <div class="dashboard-layout">
+                
+                <!-- LEFT SIDEBAR -->
+                <aside class="sidebar sidebar-left">
+                    <div class="sidebar-card">
+                        <div class="sidebar-header">
+                            <h3><i class="fas fa-bolt"></i> Quick Links</h3>
+                        </div>
+                        <ul class="sidebar-menu">
+                            <li><a href="/restaurants/view"><i class="fas fa-search"></i> Find Restaurants</a></li>
+                            <li><a href="/bookings/my"><i class="fas fa-calendar-check"></i> My Bookings</a></li>
+                            <li><a href="/customer/profile"><i class="fas fa-user"></i> My Profile</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <div class="sidebar-header">
+                            <h3><i class="fas fa-info-circle"></i> Help</h3>
+                        </div>
+                        <ul class="sidebar-menu">
+                            <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                            <li><a href="#"><i class="fas fa-envelope"></i> Contact Support</a></li>
+                            <li><a href="#"><i class="fas fa-book"></i> Guide</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="sidebar-card promo-card">
+                        <h4><i class="fas fa-gift"></i> Special Offer</h4>
+                        <p>Get 20% off on your next booking</p>
+                        <button class="btn-sidebar-action">Claim Now</button>
+                    </div>
+                </aside>
+
+                <!-- CENTER CONTENT -->
+                <main class="main-content">
+                    <!-- Quick Actions Section -->
+                    <section class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-bolt"></i> Quick Actions</h2>
+                            <p>Get started with one click</p>
+                        </div>
+                        <div class="quick-actions-grid">
+                            <a th:href="@{/restaurants/view}" class="action-card">
+                                <div class="action-icon">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <h4>Find Restaurants</h4>
+                                <p>Discover amazing dining spots</p>
+                            </a>
+                            <a href="/bookings/my" class="action-card">
+                                <div class="action-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <h4>My Bookings</h4>
+                                <p>Manage your reservations</p>
+                            </a>
+                            <a href="/restaurants/view" class="action-card">
+                                <div class="action-icon">
+                                    <i class="fas fa-plus-circle"></i>
+                                </div>
+                                <h4>Book Table</h4>
+                                <p>Reserve your next table</p>
+                            </a>
+                            <a href="/customer/profile" class="action-card">
+                                <div class="action-icon">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <h4>Edit Profile</h4>
+                                <p>Update your information</p>
+                            </a>
+                        </div>
+                    </section>
+
+                    <!-- Two Column Grid -->
+                    <div class="grid-2col">
+                        
+                        <!-- Recent Bookings -->
+                        <section class="section-card">
+                            <div class="section-header">
+                                <h2><i class="fas fa-history"></i> Recent Bookings</h2>
+                                <a href="/bookings/my" class="view-all-link">View All →</a>
+                            </div>
+                            <div id="recent-bookings" class="bookings-list"></div>
+                        </section>
+
+                        <!-- Your Activity -->
+                        <section class="section-card">
+                            <div class="section-header">
+                                <h2><i class="fas fa-chart-line"></i> Your Activity</h2>
+                            </div>
+                            <div id="user-stats" class="activity-stats"></div>
+                        </section>
+
+                    </div>
+
+                    <!-- Popular Restaurants -->
+                    <section class="section-card">
+                        <div class="section-header">
+                            <h2><i class="fas fa-fire"></i> Trending Restaurants</h2>
+                            <p>Popular spots loved by customers</p>
+                        </div>
+                        <div id="popular-restaurants" class="restaurant-grid-small"></div>
+                    </section>
+
+                    <!-- Featured Section -->
+                    <section class="section-card featured-section">
+                        <div class="section-header">
+                            <h2><i class="fas fa-star"></i> Recommended For You</h2>
+                            <p>Based on your preferences</p>
+                        </div>
+                        <div id="featured-restaurants" class="restaurant-grid-large"></div>
+                    </section>
+                </main>
+
+                <!-- RIGHT SIDEBAR -->
+                <aside class="sidebar sidebar-right">
+                    <div class="sidebar-card">
+                        <div class="sidebar-header">
+                            <h3><i class="fas fa-star"></i> Your Stats</h3>
+                        </div>
+                        <div class="stats-sidebar">
+                            <div class="stat-mini">
+                                <span class="stat-number" id="sidebar-bookings">0</span>
+                                <span class="stat-label">Bookings</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="stat-number" id="sidebar-rating">0</span>
+                                <span class="stat-label">Avg Rating</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <div class="sidebar-header">
+                            <h3><i class="fas fa-fire"></i> Top Rated</h3>
+                        </div>
+                        <div id="top-rated" class="top-rated-list"></div>
+                    </div>
+
+                    <div class="sidebar-card tips-card">
+                        <h4><i class="fas fa-lightbulb"></i> Pro Tips</h4>
+                        <ul class="tips-list">
+                            <li>Book early for better availability</li>
+                            <li>Leave reviews to help others</li>
+                            <li>Check restaurant ratings first</li>
+                        </ul>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Dashboard JS -->
+    <script>
+        let allRestaurants = [];
+        let allBookings = [];
+
+        async function loadDashboardData() {
+            const jwt = localStorage.getItem("jwtToken");
+
+            if (!jwt) {
+                window.location.href = "/login";
+                return;
+            }
+
+            try {
+                const res = await fetch("/api/dashboard/customer/info", {
+                    headers: { "Authorization": "Bearer " + jwt }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    localStorage.removeItem("jwtToken");
+                    window.location.href = "/login";
+                    return;
+                }
+
+                const data = await res.json();
+
+                allRestaurants = data.restaurants;
+                allBookings = data.bookings;
+
+                // Hide loading, show content
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("dashboard-content").style.display = "block";
+
+                // Update dashboard sections
+                updateRecentBookings();
+                updatePopularRestaurants();
+                updateUserStats(data);
+                updateFeaturedRestaurants();
+                updateStatsCards(data);
+                
+                // Update sidebar sections
+                updateSidebarStats(data);
+                updateTopRatedRestaurants();
+
+            } catch (err) {
+                console.error("Dashboard Load Error:", err);
+                alert("Failed to load dashboard.");
+            }
+        }
+
+        function updateRecentBookings() {
+            const container = document.getElementById("recent-bookings");
+
+            if (allBookings.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <i class="fas fa-inbox" style="font-size: 2rem; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
+                        No bookings yet. Start exploring restaurants!
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = allBookings.slice(0, 5).map(b => `
+                <div class="booking-item">
+                    <div class="booking-date">
+                        <strong>${new Date(b.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</strong>
+                    </div>
+                    <div class="booking-info">
+                        <div class="booking-restaurant">${b.restaurantName || 'Restaurant'}</div>
+                        <div class="booking-time"><i class="fas fa-clock"></i> ${b.time || 'N/A'}</div>
+                    </div>
+                    <div class="booking-status">
+                        <i class="fas fa-check-circle"></i> Confirmed
+                    </div>
+                </div>
+            `).join("");
+        }
+
+        function updatePopularRestaurants() {
+            const container = document.getElementById("popular-restaurants");
+
+            if (allRestaurants.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; grid-column: 1/-1; color: var(--text-secondary);">
+                        <i class="fas fa-search" style="font-size: 2rem; opacity: 0.5; margin-bottom: 10px; display: block;"></i>
+                        No restaurants available
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = allRestaurants.slice(0, 6).map(r => `
+                <a href="/restaurants/${r.id || '#'}" class="restaurant-card" style="text-decoration: none; color: inherit;">
+                    <img src="${r.images?.[0] || '/images/default-restaurant.jpg'}" class="restaurant-image" alt="${r.name}">
+                    <div class="restaurant-info">
+                        <div class="restaurant-name">${r.name || 'Unknown'}</div>
+                        <div class="restaurant-cuisine">${r.cuisine || 'Cuisine'}</div>
+                        <div class="restaurant-rating">
+                            <i class="fas fa-star"></i>
+                            <span>${r.rating ? r.rating.toFixed(1) : 'N/A'}</span>
+                        </div>
+                    </div>
+                </a>
+            `).join("");
+        }
+
+        function updateUserStats(data) {
+            const container = document.getElementById("user-stats");
+            
+            container.innerHTML = `
+                <div class="activity-item">
+                    <span class="activity-label"><i class="fas fa-utensils"></i> Total Bookings</span>
+                    <span class="activity-value">${data.totalBookings || 0}</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-label"><i class="fas fa-heart"></i> Favorites</span>
+                    <span class="activity-value">${data.favoriteRestaurants || 0}</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-label"><i class="fas fa-star"></i> Avg Rating</span>
+                    <span class="activity-value">${data.avgRating ? data.avgRating.toFixed(1) : '0'}</span>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-label"><i class="fas fa-utensils"></i> Favorite Type</span>
+                    <span class="activity-value">${data.favoriteCuisine || 'N/A'}</span>
+                </div>
+            `;
+        }
+
+        function updateStatsCards(data) {
+            document.getElementById("stat-bookings").textContent = data.totalBookings || '0';
+            document.getElementById("stat-favorites").textContent = data.favoriteRestaurants || '0';
+            document.getElementById("stat-rating").textContent = data.avgRating ? data.avgRating.toFixed(1) : '0';
+            document.getElementById("stat-cuisine").textContent = data.favoriteCuisine || 'Diverse';
+        }
+
+        function updateFeaturedRestaurants() {
+            const container = document.getElementById("featured-restaurants");
+
+            if (allRestaurants.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; grid-column: 1/-1; color: var(--text-secondary);">
+                        <i class="fas fa-fork-and-knife" style="font-size: 3rem; opacity: 0.3; margin-bottom: 15px; display: block;"></i>
+                        <p style="font-size: 1.1rem;">Explore our restaurant collection to get personalized recommendations</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = allRestaurants.slice(0, 8).map(r => `
+                <a href="/restaurants/${r.id || '#'}" class="restaurant-card" style="text-decoration: none; color: inherit;">
+                    <img src="${r.images?.[0] || '/images/default-restaurant.jpg'}" class="restaurant-image" alt="${r.name}">
+                    <div class="restaurant-info">
+                        <div class="restaurant-name">${r.name || 'Unknown'}</div>
+                        <div class="restaurant-cuisine">${r.cuisine || 'Cuisine'}</div>
+                        <div class="restaurant-rating">
+                            <i class="fas fa-star"></i>
+                            <span>${r.rating ? r.rating.toFixed(1) : 'N/A'}</span>
+                        </div>
+                    </div>
+                </a>
+            `).join("");
+        }
+
+        function updateSidebarStats(data) {
+            const bookingsCount = document.getElementById("sidebar-bookings");
+            const avgRating = document.getElementById("sidebar-rating");
+            
+            if (bookingsCount) {
+                bookingsCount.textContent = data.totalBookings || '0';
+            }
+            if (avgRating) {
+                avgRating.textContent = data.avgRating ? data.avgRating.toFixed(1) : '0.0';
+            }
+        }
+
+        function updateTopRatedRestaurants() {
+            const container = document.getElementById("top-rated");
+            
+            if (!container) return;
+            
+            if (allRestaurants.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary); font-size: 0.9rem;">
+                        <i class="fas fa-star" style="display: block; font-size: 1.5rem; margin-bottom: 10px; opacity: 0.5;"></i>
+                        No restaurants yet
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort by rating descending and take top 5
+            const topRestaurants = [...allRestaurants]
+                .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+                .slice(0, 5);
+
+            container.innerHTML = topRestaurants.map(r => `
+                <a href="/restaurants/${r.id || '#'}" class="top-rated-item" style="text-decoration: none; color: inherit;">
+                    <div class="top-rated-content">
+                        <div class="top-rated-name">${r.name || 'Unknown'}</div>
+                        <div class="top-rated-cuisine" style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">${r.cuisine || 'Cuisine'}</div>
+                        <div class="top-rated-rating" style="display: flex; align-items: center; gap: 5px;">
+                            <i class="fas fa-star" style="color: #f39c12;"></i>
+                            <span style="font-weight: 600;">${r.rating ? r.rating.toFixed(1) : 'N/A'}</span>
+                        </div>
+                    </div>
+                </a>
+            `).join("");
+        }
+
+        // Initialize dashboard on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            loadDashboardData();
+        });
+    </script>
+
+</body>
+</html>

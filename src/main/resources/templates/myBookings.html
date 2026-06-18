@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Bookings - Table Booking</title>
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Modern Design System -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-design.css}">
+    <link rel="stylesheet" th:href="@{/css/modern-buttons.css}">
+
+    <style>
+        /* ==========================================
+           PAGE BACKGROUND & BODY
+           ========================================== */
+        body {
+            background: transparent;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ==========================================
+           HEADER & NAVIGATION
+           ========================================== */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 0;
+            box-shadow: 0 10px 40px rgba(102, 126, 234, 0.25);
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        header h1 i {
+            font-size: 2rem;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            margin-left: 25px;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-links a:hover {
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* ==========================================
+           MAIN CONTAINER
+           ========================================== */
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* ==========================================
+           PAGE HEADER
+           ========================================== */
+        .my-bookings h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin: 0 0 30px 0;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .my-bookings h2 i {
+            color: white;
+            font-size: 2.2rem;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ==========================================
+           ALERT MESSAGES
+           ========================================== */
+        .success-message, .error-message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+            color: #0f7a12;
+            border: 2px solid rgba(40, 167, 69, 0.25);
+        }
+
+        .success-message i {
+            color: #28a745;
+            font-size: 1.3rem;
+        }
+
+        .error-message {
+            background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.05));
+            color: #cc0000;
+            border: 2px solid rgba(220, 53, 69, 0.25);
+        }
+
+        .error-message i {
+            color: #dc3545;
+            font-size: 1.3rem;
+        }
+
+        /* ==========================================
+           BOOKING CARDS GRID
+           ========================================== */
+        .booking-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 25px;
+        }
+
+        /* ==========================================
+           BOOKING CARD
+           ========================================== */
+        .booking-card {
+            background: rgba(255, 255, 255, 0.98);
+            border: 2px solid rgba(102, 126, 234, 0.1);
+            border-radius: 18px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .booking-card:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.25);
+        }
+
+        /* ==========================================
+           BOOKING HEADER
+           ========================================== */
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .booking-card h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #2c3e50;
+            letter-spacing: -0.5px;
+        }
+
+        .booking-status {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+        }
+
+        .status-confirmed {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .status-cancelled {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .status-completed {
+            background: linear-gradient(135deg, #17a2b8, #0dcaf0);
+            color: white;
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        /* ==========================================
+           BOOKING INFO
+           ========================================== */
+        .booking-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #667eea;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .info-label i {
+            font-size: 1rem;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        /* ==========================================
+           BOOKING TIME
+           ========================================== */
+        .booking-time {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(240, 147, 251, 0.05));
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            grid-column: 1 / -1;
+        }
+
+        .time-display {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #667eea;
+            letter-spacing: -0.5px;
+        }
+
+        /* ==========================================
+           BOOKING ACTIONS
+           ========================================== */
+        .booking-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary, .btn-secondary {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+            border: 2px solid rgba(220, 53, 69, 0.25);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(220, 53, 69, 0.25);
+            border-color: #dc3545;
+        }
+
+        /* ==========================================
+           EMPTY STATE
+           ========================================== */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgba(102, 126, 234, 0.1);
+            border-radius: 18px;
+            backdrop-filter: blur(10px);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .empty-state p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* ==========================================
+           FOOTER
+           ========================================== */
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 20px;
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            position: relative;
+            z-index: 10;
+            box-shadow: 0 -5px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        footer p {
+            margin: 0;
+            font-weight: 500;
+        }
+
+        /* ==========================================
+           RESPONSIVE DESIGN
+           ========================================== */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.4rem;
+            }
+
+            .nav-links a {
+                margin-left: 15px;
+                font-size: 0.9rem;
+            }
+
+            .my-bookings h2 {
+                font-size: 1.8rem;
+            }
+
+            .booking-list {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-info {
+                grid-template-columns: 1fr;
+            }
+
+            .booking-actions {
+                flex-direction: column;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 15px 0;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            main {
+                padding: 20px 15px;
+            }
+
+            .booking-card {
+                padding: 18px;
+            }
+
+            .my-bookings h2 {
+                font-size: 1.4rem;
+                gap: 8px;
+            }
+
+            .my-bookings h2 i {
+                font-size: 1.6rem;
+            }
+
+            .booking-header {
+                flex-direction: column;
+            }
+
+            .booking-status {
+                align-self: flex-start;
+            }
+
+            .empty-state {
+                padding: 40px 20px;
+            }
+
+            .empty-state i {
+                font-size: 3rem;
+            }
+        }
+
+        /* Override global white text for booking cards */
+        .booking-card,
+        .booking-card p,
+        .booking-card span,
+        .booking-card h3,
+        .booking-card h4,
+        .booking-details,
+        .booking-info p {
+            color: #000 !important;
+            text-shadow: none !important;
+        }
+
+        .booking-card h3,
+        .booking-card h4 {
+            color: #212529 !important;
+        }
+    </style>
+
+</head>
+<body>
+
+<header>
+    <nav>
+        <div class="nav-container">
+            <h1><i class="fas fa-calendar-check"></i> My Bookings</h1>
+            <div class="nav-links">
+                <a href="/customer/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="/customer/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                <a href="/restaurants/view"><i class="fas fa-utensils"></i> Restaurants</a>
+                <a th:href="@{/logout}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main>
+    <section class="my-bookings">
+        <h2><i class="fas fa-bookmark"></i> My Bookings</h2>
+
+        <!-- Success Message -->
+        <div th:if="${param.success}" class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <span>Booking created successfully!</span>
+        </div>
+
+        <!-- Review Success Message -->
+        <div th:if="${param.reviewSuccess}" class="success-message">
+            <i class="fas fa-star"></i>
+            <span>Review added successfully!</span>
+        </div>
+
+        <!-- Error Message -->
+        <div th:if="${param.error}" class="error-message">
+            <i class="fas fa-exclamation-circle"></i>
+            <span>Error: <span th:text="${param.error}"></span></span>
+        </div>
+
+        <!-- Booking Cards Grid -->
+        <div class="booking-list">
+
+            <!-- Individual Booking Card -->
+            <div th:if="${bookings != null and !bookings.isEmpty()}" 
+                 th:each="booking : ${bookings}" 
+                 class="booking-card">
+
+                <!-- Card Header with Status -->
+                <div class="booking-header">
+                    <div>
+                        <h3>
+                            <i class="fas fa-utensils"></i>
+                            <span th:text="${booking.restaurantName != null ? booking.restaurantName : 'Restaurant'}">Restaurant Name</span>
+                        </h3>
+                    </div>
+                    <span th:class="'booking-status status-' + ${booking.status?.toLowerCase()} ?: 'status-pending'"
+                          th:text="${booking.status}">PENDING</span>
+                </div>
+
+                <!-- Booking Time Section -->
+                <div class="booking-time">
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${#temporals.format(booking.startTime, 'MMM dd, yyyy')}">Jan 01, 2025</span>
+                        <br>
+                        <span th:text="${#temporals.format(booking.startTime, 'HH:mm')}">10:00</span>
+                        <span style="color: #7f8c8d;"> - </span>
+                        <span th:text="${#temporals.format(booking.endTime, 'HH:mm')}">12:00</span>
+                    </div>
+                </div>
+
+                <!-- Booking Info Grid -->
+                <div class="booking-info">
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-chair"></i> Table Number
+                        </span>
+                        <span class="info-value" th:text="'Table ' + ${booking.tableNumber}">Table 1</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">
+                            <i class="fas fa-users"></i> Guests
+                        </span>
+                        <span class="info-value" th:text="${booking.numberOfGuests}">2</span>
+                    </div>
+                </div>
+
+                <!-- Booking Actions -->
+                <div class="booking-actions">
+                    <!-- Cancel Button (only if not cancelled) -->
+                    <form th:if="${booking.status != 'CANCELLED'}" 
+                          th:action="@{/bookings/{id}/cancel(id=${booking.id})}" 
+                          method="post" 
+                          style="flex: 1; min-width: 120px;">
+                        <input type="hidden" name="_method" value="put" />
+                        <button type="submit" class="btn-secondary">
+                            <i class="fas fa-times-circle"></i> Cancel
+                        </button>
+                    </form>
+
+                    <!-- Add Review Button -->
+                    <a th:href="@{/bookings/{id}/review(id=${booking.id})}" 
+                       class="btn-primary"
+                       style="flex: 1; min-width: 120px;">
+                        <i class="fas fa-star"></i> Add Review
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${bookings == null or bookings.isEmpty()}" class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No bookings found yet</p>
+                <p style="font-size: 1rem; color: #95a5a6; margin-top: 10px;">Start booking your favorite restaurants today!</p>
+            </div>
+
+        </div>
+
+    </section>
+</main>
+
+<footer>
+    <p><i class="fas fa-copyright"></i> 2025 Table Booking. All rights reserved.</p>
+</footer>
+
+<!-- Logout Form -->
+<form id="logout-form" th:action="@{/logout}" method="post" style="display: none;"></form>
+
+</body>
+</html>

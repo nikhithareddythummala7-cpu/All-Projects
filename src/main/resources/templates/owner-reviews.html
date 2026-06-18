@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Restaurant Reviews</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/owner/dashboard">Restaurant Management</a>
+        <a class="btn btn-outline-light" href="/logout">Logout</a>
+    </div>
+</nav>
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">Customer Reviews</h2>
+
+    <input type="hidden" id="restaurantId" th:value="${restaurant?.id}" />
+
+    <div id="loading" class="text-center">
+        <div class="spinner-border"></div>
+        <p>Loading reviews...</p>
+    </div>
+
+    <div id="review-list" style="display:none"></div>
+</div>
+
+<script>
+    const restaurantId = document.getElementById("restaurantId").value;
+    const token = localStorage.getItem("jwtToken");
+
+    async function loadReviews() {
+        const res = await fetch(`/api/restaurants/${restaurantId}/reviews`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
+
+        const reviews = await res.json();
+        const container = document.getElementById("review-list");
+        container.innerHTML = "";
+
+        if (reviews.length === 0) {
+            container.innerHTML = "<p>No reviews yet.</p>";
+        }
+
+        reviews.forEach(r => {
+            container.innerHTML += `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5>Rating: ${"★".repeat(r.rating)}</h5>
+                        <p>${r.comment}</p>
+                    </div>
+                </div>`;
+        });
+
+        document.getElementById("loading").style.display = "none";
+        container.style.display = "block";
+    }
+
+    loadReviews();
+</script>
+</body>
+</html>
