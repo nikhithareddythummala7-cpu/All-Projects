@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Products</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>Manage Products</h1>
+    <nav>
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/products}">Products</a>
+        <a th:href="@{/admin/orders}">Orders</a>
+        <a th:href="@{/admin/users}">Users</a>
+        <a th:href="@{/logout}">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <div class="admin-container">
+
+        <h2>Products</h2>
+
+        <!-- PRODUCTS TABLE -->
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="product : ${products}">
+                <td th:text="${product.name}"></td>
+
+                <td>₹<span th:text="${product.price}"></span></td>
+
+                <td th:text="${product.stock}"></td>
+
+                <td class="admin-actions">
+                    <a th:href="@{/admin/products/{id}/edit(id=${product.id})}">Edit</a>
+                    |
+                    <a th:href="@{/admin/products/{id}/delete(id=${product.id})}"
+                       onclick="return confirm('Are you sure you want to delete this product?')">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h3>Add / Edit / Delete Product</h3>
+
+        <!-- PRODUCT FORM -->
+        <form class="admin-form" th:action="@{/admin/products}" method="post">
+            <input type="hidden" name="id" th:value="${product.id}">
+
+            <div>
+                <label>Name:</label>
+                <input type="text" name="name" th:value="${product.name}" required>
+            </div>
+
+            <div>
+                <label>Description:</label>
+                <textarea name="description" th:text="${product.description}" required></textarea>
+            </div>
+
+            <div>
+                <label>Price:</label>
+                <input type="number" name="price" step="0.01"
+                       th:value="${product.price}" required>
+            </div>
+
+            <div>
+                <label>Stock:</label>
+                <input type="number" name="stock"
+                       th:value="${product.stock}" required>
+            </div>
+
+            <div>
+                <label>Type:</label>
+                <select name="type" required>
+                    <option value="FLOWER" th:selected="${product.type == 'FLOWER'}">Flower</option>
+                    <option value="GIFT" th:selected="${product.type == 'GIFT'}">Gift</option>
+                    <option value="COMBO" th:selected="${product.type == 'COMBO'}">Combo</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Occasion:</label>
+                <input type="text" name="occasion" th:value="${product.occasion}">
+            </div>
+
+            <!-- IMAGE URL INPUT -->
+            <div>
+                <label>Product Image URL:</label>
+                <input type="text" name="imageUrl"
+                       th:value="${product.images != null ? product.images[0] : ''}"
+                       placeholder="Paste image URL here">
+            </div>
+
+            <!-- IMAGE PREVIEW -->
+            <div th:if="${product.images != null and !product.images.isEmpty()}">
+                <img th:src="${product.images[0]}"
+                     style="width:120px; margin-top:10px; border-radius:8px;">
+            </div>
+
+            <button type="submit"
+                    th:text="${product.id != null} ? 'Update Product' : 'Add Product'"></button>
+        </form>
+
+    </div>
+</main>
+
+<footer>
+    <p>© 2025 BlossomLane • Fresh flowers, warm smiles.</p>
+</footer>
+
+<script th:src="@{/js/script.js}"></script>
+
+</body>
+</html>

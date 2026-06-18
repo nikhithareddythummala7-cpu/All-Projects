@@ -1,0 +1,8 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="siteFooter">
+  <footer class="site-footer">
+    <div class="container">
+      <p>&copy; <span th:text="${#temporals.format(#temporals.createNow(), 'yyyy')}"></span> Research Publication App</p>
+    </div>
+  </footer>
+  <script th:src="@{/js/app.js}"></script>
+</div>

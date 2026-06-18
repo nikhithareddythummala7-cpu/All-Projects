@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{base :: parent(~{::#content},~{::title},~{})}">
+<head>
+    <title data-th-text="${loggedInUser.name} + ' | DashBoard | SCM'">Dashboard Page</title>
+</head>
+<body>
+<div id="content" class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Dashboard</h5>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <a data-th-href="@{'/user/contacts/add'}" class="text-decoration-none">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                <i class="fa-solid fa-user-plus fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-0 fw-semibold text-dark">Add New Contact</h5>
+                                            <p class="text-muted small mb-0">Create a new contact in your address book</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="col-md-6">
+                        <a data-th-href="@{'/user/contacts'}" class="text-decoration-none">
+                            <div class="card border-0 shadow h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                                <i class="fa-solid fa-address-book fs-4"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title mb-0 fw-semibold text-dark">View Contacts</h5>
+                                            <p class="text-muted small mb-0">Browse and manage your contacts</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

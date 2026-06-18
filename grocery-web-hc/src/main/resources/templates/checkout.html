@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout • FreshCart</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .form { max-width: 520px; margin: 0 auto; display: grid; gap: 12px; }
+    .field { display: grid; gap: 6px; }
+    .field label { font-weight: 600; }
+    .row { display: flex; gap: 12px; }
+    .row .field { flex: 1; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">FreshCart</a>
+    <nav>
+      <a href="/products">Products</a>
+      <a href="/cart">Cart</a>
+      <a href="/orders">Orders</a>
+      <a id="auth-link" href="/login">Login</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>Checkout</h1>
+    <form id="checkout-form" class="form">
+      <div class="field">
+        <label for="address">Shipping address</label>
+        <textarea id="address" rows="3" placeholder="House no, Street, City" required></textarea>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="phone">Phone number</label>
+          <input id="phone" type="tel" placeholder="e.g. 9876543210" required />
+        </div>
+        <div class="field">
+          <label for="payment">Payment method</label>
+          <select id="payment">
+            <option value="COD" selected>Cash on Delivery</option>
+            <option value="CARD">Card</option>
+          </select>
+        </div>
+      </div>
+      <button class="button" type="submit">Place order</button>
+      <div id="checkout-error" class="error"></div>
+    </form>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    updateAuthLink();
+    const form = document.getElementById('checkout-form');
+    form.addEventListener('submit', submitCheckout);
+  </script>
+</body>
+</html>

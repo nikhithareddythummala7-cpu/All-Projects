@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Results</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        * {
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            padding: 40px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: #667eea;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        h3 {
+            color: #667eea;
+            font-weight: 700;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .text-muted {
+            color: #999;
+        }
+        
+        .badge {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .card-body {
+            padding: 25px;
+        }
+        
+        .result-card {
+            border-left: 5px solid #667eea;
+        }
+        
+        .result-card.winner {
+            border-left: 5px solid #ffc107;
+            background: linear-gradient(to right, rgba(255,193,7,0.05), transparent);
+        }
+        
+        .progress {
+            height: 35px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none;
+            padding: 12px 20px;
+            font-weight: 600;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+            color: white;
+        }
+        
+        .btn-outline-secondary {
+            color: #667eea;
+            border: 2px solid #667eea;
+            font-weight: 600;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin/dashboard">🛡️ Admin Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 th:text="${election.name}"></h1>
+                <p class="text-muted">Election Results</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="badge" 
+                      th:classappend="${election.status.name() == 'RESULTS_DECLARED' ? 'bg-success' : 'bg-warning'}"
+                      th:text="${election.status}"></span>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <p><strong>Total Votes Cast:</strong> <span th:text="${totalVotes}"></span></p>
+                        <p><strong>Candidates:</strong> <span th:text="${candidates.size()}"></span></p>
+                        <p th:if="${election.resultsDeclaredDate}">
+                            <strong>Results Declared:</strong> <span th:text="${#temporals.format(election.resultsDeclaredDate, 'yyyy-MM-dd HH:mm')}"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h3>📊 Results Breakdown</h3>
+                <div th:each="candidate : ${candidates}" 
+                     class="result-card card"
+                     th:classappend="${#lists.indexOf(candidates, candidate) == 0 ? 'winner' : ''}">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h5 th:text="${candidate.name}"></h5>
+                                <p class="text-muted" th:text="${candidate.party}"></p>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" 
+                                         role="progressbar" 
+                                         th:style="${'width: ' + ((candidate.voteCount * 100) / totalVotes > 0 ? (candidate.voteCount * 100) / totalVotes : 0) + '%'}"
+                                         th:text="${candidate.voteCount + ' votes'}">
+                                    </div>
+                                </div>
+                                <p class="mt-2">
+                                    <strong th:text="${#numbers.formatDecimal((candidate.voteCount * 100) / totalVotes, 1, 2) + '%'}"></strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <form method="POST" th:action="'/admin/election/' + ${election.id} + '/declare-results'" 
+                      style="display: inline;"
+                      th:if="${election.status.name() != 'RESULTS_DECLARED'}">
+                    <button type="submit" class="btn btn-success btn-lg">Declare Results</button>
+                </form>
+                
+                <form method="POST" th:action="'/admin/election/' + ${election.id} + '/lock'" 
+                      style="display: inline;"
+                      th:if="${election.status.name() == 'RESULTS_DECLARED'}">
+                    <button type="submit" class="btn btn-danger btn-lg">Lock Election</button>
+                </form>
+                
+                <a href="/admin/elections" class="btn btn-secondary btn-lg">Back to Elections</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

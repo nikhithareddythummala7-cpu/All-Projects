@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Search • Research Publications</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <h2>Search Publications</h2>
+      <form id="searchForm" class="card" style="margin-bottom: 1rem">
+        <div class="grid two">
+          <div class="field">
+            <label>Domain</label>
+            <input type="text" name="domain" placeholder="e.g., AI, Biology" />
+          </div>
+          <div class="field">
+            <label>Keywords (query)</label>
+            <input type="text" name="q" placeholder="e.g., transformers, datasets" />
+          </div>
+          <div class="field">
+            <label>Author</label>
+            <input type="text" name="author" placeholder="Author name" />
+          </div>
+          <div class="field">
+            <label>Date From</label>
+            <input type="date" name="from" />
+          </div>
+          <div class="field">
+            <label>Date To</label>
+            <input type="date" name="to" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Search</button>
+        </div>
+      </form>
+
+      <div id="searchResults" class="grid"></div>
+      <p id="searchEmpty" class="muted" style="display:none">No results found.</p>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Voting</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .voting-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .candidate-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .candidate-card:hover {
+            border-color: #667eea;
+            background-color: #f8f9ff;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+        .candidate-card.selected {
+            border-color: #28a745;
+            background-color: #e8f5e9;
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);
+        }
+        .candidate-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+        .candidate-card.disabled:hover {
+            border-color: #e0e0e0;
+            background-color: #f5f5f5;
+            box-shadow: none;
+        }
+        .radio-candidate {
+            display: none;
+        }
+        .status-badge {
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .info-section {
+            background: #e8f4f8;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/voter/dashboard">🗳️ Voter Dashboard</a>
+            <div class="d-flex">
+                <a class="btn btn-light btn-sm" href="/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="voting-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a href="/voter/elections" class="btn btn-outline-secondary btn-sm mb-3">← Back to Elections</a>
+                    <h1 th:text="${election.name}"></h1>
+                    <p class="text-muted" th:text="${election.description}"></p>
+                </div>
+                <div class="text-end">
+                    <div th:if="${hasVoted}" class="alert alert-success m-0">
+                        <strong>✓ VOTED</strong><br>
+                        <small>Vote submitted successfully</small>
+                    </div>
+                    <div th:unless="${hasVoted}" class="alert alert-warning m-0">
+                        <strong>⊙ PENDING</strong><br>
+                        <small>Select your candidate</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-section">
+                <h5>📋 Election Information</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Start Date:</strong> <span th:text="${#temporals.format(election.startDate, 'dd MMM yyyy HH:mm')}"></span></p>
+                        <p class="mb-1"><strong>End Date:</strong> <span th:text="${#temporals.format(election.endDate, 'dd MMM yyyy HH:mm')}"></span></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Total Candidates:</strong> <span th:text="${candidates.size()}"></span></p>
+                        <p class="mb-1"><strong>Status:</strong> <span class="badge bg-primary" th:text="${election.status}"></span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Already Voted Message -->
+            <div th:if="${hasVoted}" class="alert alert-success alert-dismissible fade show">
+                <strong>✓ Vote Recorded</strong><br>
+                You have already voted in this election. Your vote cannot be changed or modified. 
+                <br><br>
+                <a href="/voter/elections" class="btn btn-success btn-sm">Back to Elections</a>
+                <a th:href="@{'/voter/results/' + ${election.id}}" class="btn btn-info btn-sm">View Results</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Voting Disabled Message -->
+            <div th:unless="${canVote}" class="alert alert-warning alert-dismissible fade show">
+                <strong>⚠️ Voting Not Available</strong><br>
+                Voting is not available for this election at the moment. This election may not be active yet or has already ended.
+                <br><br>
+                <a th:href="@{'/voter/results/' + ${election.id}}" class="btn btn-info btn-sm">View Results</a>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Voting Section - Only if can vote and hasn't voted -->
+            <div th:if="${canVote && !hasVoted}">
+                <h3>🗳️ Select Your Candidate</h3>
+                <p class="text-muted">Click on a candidate card to select them, then submit your vote.</p>
+
+                <form method="POST" action="/voter/vote/submit">
+                    <input type="hidden" name="electionId" th:value="${election.id}">
+                    
+                    <div th:each="candidate : ${candidates}" 
+                         class="candidate-card" 
+                         onclick="selectCandidate(this)">
+                        <input type="radio" name="candidateId" th:value="${candidate.id}" 
+                               class="radio-candidate" required>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 th:text="${candidate.name}"></h5>
+                                <p class="text-muted mb-2" th:text="${candidate.party}"></p>
+                                <p th:text="${candidate.description}"></p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="symbol-badge">
+                                    <p class="text-muted mb-0">Symbol</p>
+                                    <h4 th:text="${candidate.symbol}"></h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 border-top pt-4">
+                        <div class="alert alert-danger" role="alert">
+                            <strong>⚠️ Important:</strong> Once you submit your vote, it <strong>CANNOT be changed or modified</strong>. 
+                            Please verify your selection carefully before submitting.
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-lg" onclick="return confirmVote()">
+                            ✓ Submit Vote
+                        </button>
+                        <a href="/voter/elections" class="btn btn-secondary btn-lg">Cancel</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- View Results Section -->
+            <div th:unless="${canVote || hasVoted}" class="mt-4">
+                <div class="alert alert-info">
+                    <h5>📊 Election Results</h5>
+                    <p>Click below to view the election results and see how the voting went.</p>
+                    <a th:href="@{'/voter/results/' + ${election.id}}" class="btn btn-info">View Results</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function selectCandidate(element) {
+            // Only allow selection if voting is enabled
+            const form = document.querySelector('form');
+            if (!form) return; // Form not available means voting is disabled
+            
+            document.querySelectorAll('.candidate-card:not(.disabled)').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            element.querySelector('input[type="radio"]').checked = true;
+        }
+
+        function confirmVote() {
+            const selected = document.querySelector('.candidate-card.selected h5');
+            if (!selected) {
+                alert('Please select a candidate');
+                return false;
+            }
+            
+            const candidateName = selected.textContent;
+            return confirm('Are you sure you want to vote for ' + candidateName + '?\n\n⚠️ This action CANNOT be undone!');
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin • Analytics</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <h2>Analytics</h2>
+      <div id="analyticsCards" class="grid">
+        <div class="card"><div class="card-body"><h3>Users</h3><p id="metricUsers">-</p></div></div>
+        <div class="card"><div class="card-body"><h3>Publications</h3><p id="metricPubs">-</p></div></div>
+        <div class="card"><div class="card-body"><h3>Domains</h3><p id="metricDomains">-</p></div></div>
+        <div class="card"><div class="card-body"><h3>Downloads</h3><p id="metricDownloads">-</p></div></div>
+      </div>
+
+      <h3 style="margin-top:1rem">Publications by Domain</h3>
+      <table class="table">
+        <thead>
+          <tr><th>Domain</th><th>Count</th></tr>
+        </thead>
+        <tbody id="byDomainTable"></tbody>
+      </table>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

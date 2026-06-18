@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>SB Stocks - Home</title>
+  <link rel="stylesheet" th:href="@{/css/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <div class="navbar" id="navbar">
+    <!-- Content will be injected by JS depending on userType -->
+  </div>
+
+  <div class="homePage">
+
+    <!-- Trending Stocks -->
+    <div class="trending-stocks-container">
+      <h2>Trending stocks</h2>
+      <div class="trending-stocks" id="trendingStocks">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+
+    <!-- All Stocks -->
+    <div class="all-stocks-container">
+      <div class="all-stocks-container-head">
+        <h2>Watchlist</h2>
+        <div class="all-stocks-container-search">
+          <input type="text" id="stockSearch" placeholder="Enter Stock Symbol....">
+          <span id="searchIcon">🔍</span>
+        </div>
+      </div>
+      <div class="all-stocks" id="allStocks">
+        <!-- Thymeleaf will render stocks data here -->
+        <div th:if="${stocks != null and !stocks.empty}" th:each="stock : ${stocks}" class="all-stocks-stock">
+          <h4 th:text="${stock.name}">Stock Name</h4>
+          <p><strong>Symbol:</strong> <span th:text="${stock.symbol}">SYMBOL</span></p>
+          <p><strong>Price:</strong> <span style="color: #27ae60; font-weight: 700;">$<span th:text="${#numbers.formatDecimal(stock.price, 1, 2)}">0.00</span></span></p>
+          <p><strong>Shares:</strong> <span th:text="${stock.count}">0</span></p>
+          <p><strong>Total Value:</strong> <span style="color: #2c3e50; font-weight: 700;">$<span th:text="${#numbers.formatDecimal(stock.totalPrice, 1, 2)}">0.00</span></span></p>
+        </div>
+        <div th:if="${stocks == null or stocks.empty}" class="no-stocks">
+          <p>No stocks available</p>
+        </div>
+        <div class="loading-spinner" style="display: none;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script th:src="@{/js/navbar.js}"></script>
+  <script th:src="@{/js/home.js}"></script>
+</body>
+</html>

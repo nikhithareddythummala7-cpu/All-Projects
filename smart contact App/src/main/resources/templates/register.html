@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{base :: parent(~{::#content},~{::title},~{})}">
+<head>
+    <title>Register</title>
+</head>
+<body>
+<section id="content">
+
+    <!--  Body Wrapper -->
+    <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+         data-sidebar-position="fixed" data-header-position="fixed">
+        <div class="position-relative overflow-hidden radial-gradient min-vh-100 d-flex align-items-center justify-content-center">
+            <div class="d-flex align-items-center justify-content-center w-100">
+                <div class="row justify-content-center w-100">
+                    <div class="col-md-8 col-lg-6 col-xxl-6">
+                        <div class="card mb-0">
+                            <div class="card-body">
+                                <!-- Message Here -->
+                                <div data-th-replace="~{message :: messagebox}"></div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <p class="text-center">Registration</p>
+                                    </div>
+                                </div>
+                                <form data-th-action="@{'/do-register'}" method="post" data-th-object="${userForm}" novalidate>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="name" class="form-label">Username</label>
+                                                <input type="text" class="form-control" id="name" data-th-field="*{name}" aria-describedby="textHelp">
+                                                <div data-th-if="${#fields.hasErrors('name')}"  data-th-errors="*{name}" class="form-text text-danger"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="email" class="form-label">Email Address</label>
+                                                <input type="email" class="form-control" id="email" data-th-field="*{email}" aria-describedby="emailHelp">
+                                                <div data-th-if="${#fields.hasErrors('email')}"  data-th-errors="*{email}" class="form-text text-danger"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="password" class="form-label">New Password</label>
+                                                <input type="password" class="form-control" id="password" data-th-field="*{password}">
+                                                <div data-th-if="${#fields.hasErrors('password')}"  data-th-errors="*{password}" class="form-text text-danger"></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="phone" class="form-label">Phone Number</label>
+                                                <input type="number" class="form-control" id="phone" data-th-field="*{phoneNumber}">
+                                                <div data-th-if="${#fields.hasErrors('phoneNumber')}"  data-th-errors="*{phoneNumber}" class="form-text text-danger"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-4">
+                                                <label for="about" class="form-label">Write something about yourself</label>
+                                                <textarea class="form-control" id="about" data-th-field="*{about}" rows="5" placeholder="Write here..."></textarea>
+                                                <div data-th-if="${#fields.hasErrors('about')}"  data-th-errors="*{about}" class="form-text text-danger"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign Up</button>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <p class="fs-4 mb-0 fw-bold">Already have an Account?</p>
+                                        <a class="text-primary fw-bold ms-2" data-th-href="@{'/login'}">Sign In</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+</body>
+</html>

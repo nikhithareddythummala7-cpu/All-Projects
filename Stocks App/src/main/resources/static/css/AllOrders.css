@@ -1,0 +1,65 @@
+.orderPage {
+    padding-top: 10vh;
+    display: flex;
+    justify-content: center;
+    background-color: #f9faff;
+    min-height: 90vh;
+}
+
+.all-orders-container {
+    width: 90%;
+    max-width: 1200px;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 0.6rem;
+    box-shadow: rgba(17, 17, 26, 0.05) 0px 4px 16px,
+                rgba(17, 17, 26, 0.05) 0px 8px 32px;
+}
+
+.all-orders-container-head h2 {
+    font-size: 2rem;
+    color: rgba(29, 74, 123, 0.82);
+    margin-bottom: 1.5rem;
+}
+
+.all-orders {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 70vh;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.all-orders::-webkit-scrollbar {
+    display: none;
+}
+
+.all-orders-stock {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border: 1px solid #22476979;
+    border-radius: 0.8rem;
+    flex-wrap: wrap;
+    background-color: rgba(246, 251, 255, 0.664);
+}
+
+.all-orders-stock span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 5px;
+}
+
+.all-orders-stock span h5 {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgba(35, 80, 120, 0.71);
+}
+
+.all-orders-stock span p {
+    margin: 0;
+    font-size: 0.9rem;
+}

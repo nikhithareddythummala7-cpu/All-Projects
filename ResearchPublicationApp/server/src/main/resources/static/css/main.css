@@ -1,0 +1,64 @@
+* { box-sizing: border-box; }
+:root { --bg:#0b1020; --card:#121933; --text:#e9eefc; --muted:#a8b2d1; --accent:#4f46e5; }
+html, body {
+  padding:0; margin:0;
+  /* Full-page background with soft overlay */
+  background-image:
+    linear-gradient(rgba(11,16,32,0.75), rgba(11,16,32,0.85)),
+    url('/img/home-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color:var(--text);
+  font-family:'Inter',system-ui,Arial,sans-serif;
+}
+.container { max-width: 1000px; margin: 0 auto; padding: 1.25rem; }
+.site-header { border-bottom: 1px solid rgba(255,255,255,0.08); position: sticky; top:0; backdrop-filter: blur(6px); background: rgba(11,16,32,0.7); }
+.site-header .brand { color: var(--text); text-decoration:none; font-weight:700; }
+.nav { display:flex; gap:1rem; align-items:center; }
+.nav a { color: var(--text); text-decoration:none; opacity:.9 }
+.nav .btn { padding:.5rem .9rem; background:var(--accent); border-radius:.5rem; color:white; }
+.btn { display:inline-block; padding:.75rem 1.1rem; background:var(--accent); color:#fff; border-radius:.6rem; text-decoration:none; border:none; cursor:pointer; }
+.btn.outline { background: transparent; border:1px solid var(--accent); color: var(--text); }
+.btn.small { padding: .5rem .8rem; font-size:.9rem; }
+.hero { padding: 3rem 0; text-align:center; }
+.hero h1 { font-size:2.2rem; margin:.2rem 0 0.8rem; }
+.muted { color: var(--muted); }
+.grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.card { background: var(--card); border: 1px solid rgba(255,255,255,0.08); border-radius: .8rem; }
+.card-body { padding: 1rem; }
+.form { display:grid; gap:.8rem; max-width:420px; }
+.form label { display:grid; gap:.3rem; color: var(--muted); }
+.form input { padding:.7rem .8rem; border-radius:.5rem; background:#0f1530; color:var(--text); border:1px solid rgba(255,255,255,0.1); }
+.site-footer { border-top: 1px solid rgba(255,255,255,0.08); margin-top:2rem; }
+.tag { display:inline-block; padding:.2rem .5rem; margin:.2rem; background:#0f1530; border:1px solid rgba(255,255,255,.08); border-radius:.5rem; color:var(--muted); }
+
+/* Beautiful hero banner with background image */
+.hero-banner {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  padding: 4rem 1rem;
+  background-image:
+    linear-gradient(rgba(11,16,32,0.75), rgba(11,16,32,0.75)),
+    url('/img/home-bg.jpg'); /* place your background image at static/img/home-bg.jpg */
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.hero-banner .hero-inner { max-width: 780px; margin: 0 auto; }
+
+/* Status badges */
+.badge {
+  display:inline-block;
+  padding:.2rem .6rem;
+  border-radius: 999px;
+  font-size:.78rem;
+  border:1px solid rgba(255,255,255,.1);
+  color: #dbe4ff;
+  background:#0f1530;
+  text-transform: capitalize;
+}
+.badge.accepted { background: rgba(34,197,94,.15); border-color: rgba(34,197,94,.35); color: #a7f3d0; }
+.badge.pending  { background: rgba(234,179,8,.15); border-color: rgba(234,179,8,.35); color: #fde68a; }
+.badge.rejected { background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.35); color: #fecaca; }

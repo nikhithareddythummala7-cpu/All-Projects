@@ -1,0 +1,242 @@
+{
+  "cartApiEndpoints": {
+    "baseUrl": "http://localhost:8080/api/cart",
+    "authentication": {
+      "required": true,
+      "method": "JWT Bearer Token",
+      "header": "Authorization: Bearer <your_jwt_token>",
+      "requiredRole": "ROLE_USER"
+    },
+    "endpoints": [
+      {
+        "method": "POST",
+        "endpoint": "/api/cart",
+        "description": "Add item to shopping cart",
+        "request": {
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "body": {
+            "userId": 1,
+            "productId": 5,
+            "quantity": 2
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": 15,
+              "user": {
+                "id": 1,
+                "username": "john_doe",
+                "email": "john@example.com"
+              },
+              "product": {
+                "id": 5,
+                "name": "Organic Apples",
+                "price": 4.99,
+                "stock": 50
+              },
+              "quantity": 2
+            }
+          },
+          "error": {
+            "status": 400,
+            "body": "Error adding to cart: Insufficient stock. Available: 10"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/cart/{userId}",
+        "description": "Get all items in user's cart",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "pathVariables": {
+            "userId": 1
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": [
+              {
+                "id": 15,
+                "product": {
+                  "id": 5,
+                  "name": "Organic Apples",
+                  "price": 4.99,
+                  "category": "Fruits"
+                },
+                "quantity": 2
+              },
+              {
+                "id": 16,
+                "product": {
+                  "id": 8,
+                  "name": "Whole Wheat Bread",
+                  "price": 3.49,
+                  "category": "Bakery"
+                },
+                "quantity": 1
+              }
+            ]
+          },
+          "error": {
+            "status": 400,
+            "body": "Error fetching cart items: User not found"
+          }
+        }
+      },
+      {
+        "method": "PUT",
+        "endpoint": "/api/cart/{itemId}",
+        "description": "Update cart item quantity",
+        "request": {
+          "headers": {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "pathVariables": {
+            "itemId": 15
+          },
+          "queryParams": {
+            "quantity": 3
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": {
+              "id": 15,
+              "user": {
+                "id": 1,
+                "username": "john_doe"
+              },
+              "product": {
+                "id": 5,
+                "name": "Organic Apples",
+                "price": 4.99
+              },
+              "quantity": 3
+            }
+          },
+          "error": {
+            "status": 400,
+            "body": "Error updating cart item: Cart item not found"
+          }
+        }
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/cart/{itemId}",
+        "description": "Remove item from cart",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "pathVariables": {
+            "itemId": 15
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": "Item removed from cart successfully"
+          },
+          "error": {
+            "status": 400,
+            "body": "Error removing cart item: Cart item not found"
+          }
+        }
+      },
+      {
+        "method": "DELETE",
+        "endpoint": "/api/cart/user/{userId}",
+        "description": "Clear user's entire cart",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "pathVariables": {
+            "userId": 1
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": "Cart cleared successfully"
+          },
+          "error": {
+            "status": 400,
+            "body": "Error clearing cart: User not found"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/cart/total/{userId}",
+        "description": "Calculate total price of cart items",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "pathVariables": {
+            "userId": 1
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": 13.47
+          },
+          "error": {
+            "status": 400,
+            "body": "Error calculating cart total: User not found"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "endpoint": "/api/cart/count/{userId}",
+        "description": "Get total quantity of items in cart",
+        "request": {
+          "headers": {
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          },
+          "pathVariables": {
+            "userId": 1
+          }
+        },
+        "response": {
+          "success": {
+            "status": 200,
+            "body": 3
+          },
+          "error": {
+            "status": 400,
+            "body": "Error getting cart item count: User not found"
+          }
+        }
+      }
+    ],
+    "curlExamples": {
+      "addToCart": "curl -X POST http://localhost:8080/api/cart \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Authorization: Bearer YOUR_JWT_TOKEN\" \\\n  -d '{\"userId\": 1, \"productId\": 5, \"quantity\": 2}'",
+      "getCart": "curl -X GET http://localhost:8080/api/cart/1 \\\n  -H \"Authorization: Bearer YOUR_JWT_TOKEN\"",
+      "updateQuantity": "curl -X PUT \"http://localhost:8080/api/cart/15?quantity=3\" \\\n  -H \"Authorization: Bearer YOUR_JWT_TOKEN\"",
+      "removeItem": "curl -X DELETE http://localhost:8080/api/cart/15 \\\n  -H \"Authorization: Bearer YOUR_JWT_TOKEN\""
+    },
+    "errorCodes": {
+      "200": "Success",
+      "400": "Bad Request - Validation error or business rule violation",
+      "401": "Unauthorized - Invalid or missing authentication",
+      "403": "Forbidden - User doesn't have required role",
+      "404": "Not Found - Resource not found",
+      "500": "Internal Server Error"
+    }
+  }
+}

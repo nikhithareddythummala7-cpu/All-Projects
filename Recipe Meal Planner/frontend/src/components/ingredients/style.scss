@@ -1,0 +1,35 @@
+@import "../../mixins.scss";
+
+.ingredients {
+  list-style-type: none;
+  padding-left: 0;
+  background-color: var(--bg3);
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 300px;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    width: 6px; /* Set scrollbar width */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--text1); /* Set scrollbar thumb color */
+    border-radius: 5px; /* Add border radius for thumb */
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 10px;
+    background-color: transparent; /* Set scrollbar track color */
+  }
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    p {
+      width: 200px;
+    }
+  }
+}

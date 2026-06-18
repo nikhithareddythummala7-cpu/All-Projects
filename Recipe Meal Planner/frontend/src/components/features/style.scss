@@ -1,0 +1,58 @@
+@import "../../mixins.scss";
+.features-background-container {
+  background-image: url("../../assets/image3.jpg");
+  background-size: cover;
+  background-position: center;
+
+  .features-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 20px;
+    text-align: center;
+
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 30px;
+    }
+
+    .feature {
+      margin-bottom: 50px;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 10px 10px 16px rgba(255, 99, 71, 0.5);
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .feature-icon {
+        font-size: 3rem;
+        color: var(--text1);
+      }
+
+      .feature-title {
+        font-size: 1.5rem;
+        color: var(--text2);
+        margin-top: 15px;
+      }
+
+      .feature-description {
+        color: var(--text1);
+        margin-top: 10px;
+      }
+    }
+
+    .feature1 {
+      background-color: var(--bg1);
+    }
+
+    .feature2 {
+      background-color: var(--bg2);
+    }
+
+    .feature3 {
+      background-color: var(--bg3);
+    }
+  }
+}

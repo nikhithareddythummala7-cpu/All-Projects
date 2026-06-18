@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Products • FreshCart</title>
+	<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+	<header class="site-header">
+		<a class="logo" href="/">FreshCart</a>
+		<nav>
+			<a href="/products" class="active">Products</a>
+			<a href="/cart">Cart</a>
+			<a href="/orders">Orders</a>
+			<a id="admin-link" href="/admin" style="display:none">Admin</a>
+			<a id="auth-link" href="/login">Login</a>
+		</nav>
+	</header>
+
+	<main class="container">
+		<h1>Products</h1>
+		<div id="admin-products-actions" style="display:none; position:fixed; right:24px; bottom:24px; z-index:1000;">
+			<button class="button" style="border-radius:999px; padding:14px 18px; box-shadow:0 6px 12px rgba(0,0,0,0.15);" onclick="adminOpenProductCreate()">+ Add product</button>
+		</div>
+		<input id="search" type="search" placeholder="Search products..." />
+		<div id="products" class="grid"></div>
+		<div id="products-error" class="error"></div>
+	</main>
+
+	<script src="/js/app.js"></script>
+	<script>
+		updateAuthLink();
+		// Show admin product actions if user is ADMIN
+		try {
+			const auth = JSON.parse(localStorage.getItem('auth')||'null');
+			if (auth && String(auth.role||'').toUpperCase() === 'ADMIN') {
+				document.getElementById('admin-products-actions').style.display = '';
+			}
+		} catch {}
+		loadProducts();
+		document.getElementById('search').addEventListener('input', handleSearchInput);
+	</script>
+</body>
+</html>
+
+

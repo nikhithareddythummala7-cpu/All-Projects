@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin • Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <h2>Admin Dashboard</h2>
+      <div class="grid">
+        <a class="card" th:href="@{/admin/publications}">
+          <div class="card-body">
+            <h3>Publications Moderation</h3>
+            <p>Approve or reject pending publications.</p>
+          </div>
+        </a>
+        <a class="card" th:href="@{/admin/domains}">
+          <div class="card-body">
+            <h3>Domains</h3>
+            <p>Manage categories (AI, Biology, Finance...).</p>
+          </div>
+        </a>
+        <a class="card" th:href="@{/admin/users}">
+          <div class="card-body">
+            <h3>Users</h3>
+            <p>Activate or deactivate user accounts.</p>
+          </div>
+        </a>
+        <a class="card" th:href="@{/admin/analytics}">
+          <div class="card-body">
+            <h3>Analytics</h3>
+            <p>View counts and trends.</p>
+          </div>
+        </a>
+      </div>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

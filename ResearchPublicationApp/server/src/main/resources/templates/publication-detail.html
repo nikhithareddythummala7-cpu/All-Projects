@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title th:text="${pub != null} ? ${pub.title} + ' • Research Publications' : 'Publication • Research Publications'">Publication</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <article th:if="${pub} != null">
+        <h1 th:text="${pub.title}">Title</h1>
+        <p class="muted">
+          <span th:text="${pub.domain}">Domain</span>
+          <span> · </span>
+          <span th:text="${pub.publishedDate}">Date</span>
+        </p>
+        <p th:text="${pub.description}">Description...</p>
+        <div th:if="${pub.pdfFileName}">
+          <a class="btn" th:href="@{'/pdfs/' + ${pub.pdfFileName}}" target="_blank">Open PDF</a>
+        </div>
+        <div class="tags" th:if="${pub.keywords} != null">
+          <span class="tag" th:each="k : ${pub.keywords}" th:text="${k}">keyword</span>
+        </div>
+      </article>
+      <p th:if="${pub} == null">Publication not found.</p>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+  </body>
+</html>

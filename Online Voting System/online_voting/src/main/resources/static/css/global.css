@@ -1,0 +1,57 @@
+/* Global styles for all pages */
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* Blurred background - behind all content */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/bg.jpeg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(8px) brightness(0.9);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Ensure main content is readable and NOT blurred */
+.container, .card, .modal-content {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(0px);
+  position: relative;
+  z-index: 2;
+}
+
+/* Text should always be clear */
+body, p, h1, h2, h3, h4, h5, h6, a, button, input, label, span {
+  filter: none !important;
+}
+
+/* Override inline gradient styles on navbar */
+.navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  opacity: 0.95;
+  position: relative;
+  z-index: 10;
+}
+
+/* For pages with full-width gradients, overlay the background */
+.admin-navbar, .officer-navbar, .voter-navbar {
+  background-attachment: fixed;
+  position: relative;
+  z-index: 10;
+}

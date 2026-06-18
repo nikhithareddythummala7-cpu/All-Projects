@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>SB Stocks (Admin)</title>
+  <link rel="stylesheet" th:href="@{/css/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/admin.css}">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <div class="navbar" id="navbar">
+    <!-- Content will be injected by JS depending on userType -->
+  </div>
+
+  <!-- ✅ Protect Admin Page -->
+  <script th:src="@{/js/authGuard.js}"></script>
+  <script> protectAdminPage(); </script>
+
+  <div class="adminPage">
+
+    <div class="trending-stocks-container">
+      <h2>Trending stocks</h2>
+      <div id="trending-stocks" class="trending-stocks">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+
+    <div class="all-stocks-container">
+      <div class="all-stocks-container-head">
+        <h2>Watchlist</h2>
+        <div class="all-stocks-container-search">
+          <input type="text" id="stockSearch" placeholder="Enter Stock Symbol...." />
+          <span id="searchIcon">🔍</span>
+        </div>
+      </div>
+      <div id="all-stocks" class="all-stocks">
+        <div class="loading-spinner"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script th:src="@{/js/navbar.js}"></script>
+  <script th:src="@{/js/admin.js}"></script>
+</body>
+</html>

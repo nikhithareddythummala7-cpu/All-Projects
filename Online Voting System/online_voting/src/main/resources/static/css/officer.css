@@ -1,0 +1,49 @@
+/* Shared officer styles */
+body.officer-page {
+  background-image: url('/images/bg.jpeg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  min-height: 100vh;
+  color: #222;
+}
+.officer-container {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.officer-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+.officer-navbar {
+  background: transparent;
+}
+.officer-navbar .navbar-brand {
+  color: #fff;
+  font-weight: 700;
+}
+.officer-stat-card {
+  border-left: 6px solid #2575fc;
+}
+.btn-action {
+  border-radius: 6px;
+}
+.candidate-card {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 18px;
+  background: #fff;
+}
+.notice-box {
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+/* responsive tweaks */
+@media (max-width: 768px) {
+  .officer-container { padding: 0 12px; }
+}

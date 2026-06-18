@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Research Publications</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <section class="hero hero-banner">
+        <div class="hero-inner">
+          <h1>Discover and Share Research</h1>
+          <p class="muted">Browse accepted publications or submit your own for evaluation.</p>
+          <div class="actions" style="margin-top:1rem">
+            <a id="heroPrimaryBtn" class="btn" th:href="@{/publications}">Browse Publications</a>
+            <a id="heroSecondaryBtn" class="btn outline" th:href="@{/login}">Login</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

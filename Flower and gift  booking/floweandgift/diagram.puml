@@ -1,0 +1,42 @@
+@startuml
+skinparam componentStyle rectangle
+title FlowerAndGift — Component View (folder → component mapping)
+
+package "FlowerAndGiftApplication (Spring Boot)" {
+  [Main: FlowerAndGiftApplication] as MAIN
+
+  rectangle "Config\n(src/.../config)" as CONFIG
+  rectangle "Controllers\n(src/.../controller)\n - Web controllers\n - REST controllers" as CONTROLLER
+  rectangle "Services\n(src/.../service)\n - Business logic\n - Transactional" as SERVICE
+  rectangle "Repositories\n(src/.../repository)\n - Spring Data MongoRepository" as REPO
+  rectangle "Domain Models\n(src/.../model)\n - Entities/DTOs" as MODEL
+  rectangle "Listeners / EventHandlers\n(src/.../listener)\n - @EventListener\n - Message consumers" as LISTENER
+  rectangle "Templates + Static\n(src/main/resources/templates)\n(src/main/resources/static)" as TEMPLATES
+  rectangle "Security / Auth\n(inside config/service)" as AUTH
+}
+
+actor User as BROWSER
+
+BROWSER --> CONTROLLER : HTTP GET/POST (forms / REST)
+BROWSER --> TEMPLATES : Loads Thymeleaf pages, JS/CSS from static
+CONTROLLER --> SERVICE : invoke business logic
+SERVICE --> REPO : read / write (MongoDB)
+SERVICE --> LISTENER : publish internal events (ApplicationEventPublisher)
+SERVICE --> AUTH : auth checks / token handling
+LISTENER --> REPO : update documents (async)
+REPO --> MODEL : persist domain objects
+
+note left of CONTROLLER
+  Examples:
+  - OrderController (handles order forms / checkout)
+  - ProductController (product CRUD)
+  - UserController (profile, admin user management)
+end note
+
+note right of SERVICE
+  Examples:
+  - OrderService: createOrder(), processPayment(), publish order event
+  - ProductService: fetchProducts(), updateStock()
+end note
+
+@enduml

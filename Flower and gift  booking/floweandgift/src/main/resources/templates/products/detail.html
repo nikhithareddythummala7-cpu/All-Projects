@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product != null ? product.name : 'Product Detail'}"></title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #C85C8E;
+            --secondary-color: #A23F75;
+            --light-pink: #FFE6F1;
+            --dark-text: #3a3a3a;
+            --light-gray: #f9fafb;
+            --border-radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--light-gray);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: var(--transition);
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            margin-right: 2rem;
+        }
+
+        /* PAGE HEADER */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .breadcrumb-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 14px;
+        }
+
+        .breadcrumb-nav a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.9;
+        }
+
+        .breadcrumb-nav a:hover {
+            opacity: 1;
+        }
+
+        /* MAIN PRODUCT DETAIL */
+        .product-detail {
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .product-detail-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            padding: 3rem;
+        }
+
+        /* IMAGE GALLERY */
+        .product-gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .big-image {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            background: var(--light-gray);
+            transition: var(--transition);
+            cursor: zoom-in;
+        }
+
+        .big-image:hover {
+            transform: scale(1.02);
+        }
+
+        .thumbnail-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .thumbnail-list img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            background: var(--light-gray);
+        }
+
+        .thumbnail-list img:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(200, 92, 142, 0.3);
+        }
+
+        /* PRODUCT INFO */
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .product-info h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-text);
+            line-height: 1.2;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .meta-badge {
+            background: var(--light-pink);
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .product-description {
+            color: #666;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .price-section {
+            padding: 1.5rem;
+            background: var(--light-pink);
+            border-radius: var(--border-radius);
+        }
+
+        .detail-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        .price-suffix {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* DETAILS GRID */
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--light-gray);
+            border-radius: var(--border-radius);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .detail-item label {
+            font-weight: 600;
+            color: #666;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-item value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        /* STOCK STATUS */
+        .stock-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .stock-status.in-stock {
+            color: #10B981;
+        }
+
+        .stock-status.out-stock {
+            color: #EF4444;
+        }
+
+        /* QUANTITY BLOCK */
+        .quantity-block {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .quantity-block label {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .quantity-input {
+            width: 100px;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(200, 92, 142, 0.1);
+        }
+
+        /* ACTION BUTTONS */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .action-buttons button {
+            flex: 1;
+            padding: 1rem;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-add-cart {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(200, 92, 142, 0.3);
+        }
+
+        .btn-add-cart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 92, 142, 0.4);
+        }
+
+        .btn-buy-now {
+            background: white;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-buy-now:hover {
+            background: var(--light-pink);
+            transform: translateY(-2px);
+        }
+
+        /* FOOTER */
+        footer {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            font-weight: 600;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .product-detail-wrapper {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                padding: 1.5rem;
+            }
+
+            .page-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .product-info h2 {
+                font-size: 1.5rem;
+            }
+
+            .detail-price {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .big-image {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container-fluid d-flex align-items-center">
+            <a th:href="@{/}" class="brand">🌸 BlossomLane</a>
+            <div style="display: flex; gap: 0.5rem; margin-left: auto;">
+                <a th:href="@{/}"><i class="fas fa-home"></i> Home</a>
+                <a th:href="@{/products}"><i class="fas fa-leaf"></i> Products</a>
+                <a th:href="@{/cart}"><i class="fas fa-shopping-cart"></i> Cart</a>
+                <a th:href="@{/orders}" sec:authorize="isAuthenticated()"><i class="fas fa-box"></i> Orders</a>
+                <a th:href="@{/user/profile}" sec:authorize="isAuthenticated()"><i class="fas fa-user"></i> Profile</a>
+                <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')" style="background: rgba(255,255,255,0.2);"><i class="fas fa-cogs"></i> Admin</a>
+                <a th:href="@{/login}" sec:authorize="!isAuthenticated()"><i class="fas fa-sign-in-alt"></i> Login</a>
+                <a th:href="@{/logout}" sec:authorize="isAuthenticated()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header" th:if="${product != null}">
+        <h1>🎁 Product Details</h1>
+        <div class="breadcrumb-nav">
+            <a th:href="@{/}">Home</a>
+            <span>/</span>
+            <a th:href="@{/products}">Products</a>
+            <span>/</span>
+            <span th:text="${product.name}"></span>
+        </div>
+    </div>
+
+    <!-- ERROR: PRODUCT NOT FOUND -->
+    <div th:if="${product == null}" class="container mt-5">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <strong>Product Not Found</strong>
+            <p>The product you're looking for doesn't exist or has been removed.</p>
+            <a th:href="@{/products}" class="btn btn-primary mt-3">
+                <i class="fas fa-arrow-left"></i> Back to Products
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- PRODUCT DETAIL -->
+    <div class="product-detail" th:if="${product != null}">
+        <div class="product-detail-wrapper">
+            <!-- LEFT IMAGE GALLERY -->
+            <div class="product-gallery" th:if="${product != null}">
+                <img th:src="${product.images != null && product.images.size() > 0 ? product.images.get(0) : '/images/placeholder.png'}" id="bigImage" class="big-image"/>
+                <div class="thumbnail-list">
+                    <img th:each="img : ${product.images != null ? product.images : #lists.toList()}"
+                         th:src="${img}"
+                         onclick="document.getElementById('bigImage').src=this.src"
+                         style="cursor: pointer;">
+                </div>
+            </div>
+
+            <!-- RIGHT PRODUCT INFO -->
+            <div class="product-info">
+                <!-- Product Name -->
+                <h2 th:text="${product.name}"></h2>
+
+                <!-- Product Meta -->
+                <div class="product-meta">
+                    <span class="meta-badge" th:text="${product.type}"></span>
+                    <span class="meta-badge" th:text="${product.occasion}"></span>
+                    <span class="meta-badge"><i class="fas fa-star"></i> 4.8 (124 reviews)</span>
+                </div>
+
+                <!-- Product Description -->
+                <p class="product-description" th:text="${product.description}"></p>
+
+                <!-- Price Section -->
+                <div class="price-section">
+                    <div class="detail-price">₹<span th:text="${product.price}"></span></div>
+                    <div class="price-suffix"><i class="fas fa-shipping-fast"></i> Free shipping on orders above ₹500</div>
+                </div>
+
+                <!-- Details Grid -->
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <label><i class="fas fa-box"></i> Stock Status</label>
+                        <value th:classappend="${product != null and product.stock > 0 ? 'stock-status in-stock' : 'stock-status out-stock'}">
+                            <span th:if="${product.stock > 0}">
+                                <i class="fas fa-check-circle"></i> In Stock (<span th:text="${product.stock}"></span> available)
+                            </span>
+                            <span th:unless="${product.stock > 0}">
+                                <i class="fas fa-times-circle"></i> Out of Stock
+                            </span>
+                        </value>
+                    </div>
+
+                    <div class="detail-item" th:if="${product != null}">
+                        <label><i class="fas fa-tag"></i> Product Type</label>
+                        <value th:text="${product.type}"></value>
+                    </div>
+
+                    <div class="detail-item" th:if="${product != null}">
+                        <label><i class="fas fa-calendar"></i> Occasion</label>
+                        <value th:text="${product.occasion}"></value>
+                    </div>
+
+                    <div class="detail-item">
+                        <label><i class="fas fa-truck"></i> Delivery</label>
+                        <value>2-3 Business Days</value>
+                    </div>
+                </div>
+
+                <!-- Quantity Selection -->
+                <div class="quantity-block" th:if="${product != null}">
+                    <label for="quantity"><i class="fas fa-calculator"></i> Quantity</label>
+                    <input type="number" id="quantity" name="quantity" class="quantity-input" value="1" min="1" th:max="${product != null ? product.stock : 1}">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons" th:if="${product != null}">
+                    <form th:action="@{/cart/add}" method="post" style="flex: 1;">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <input type="hidden" name="quantity" id="cartQuantityHidden" value="1">
+                        <button type="submit" class="btn-add-cart" style="width: 100%;">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </form>
+                    <form th:action="@{/checkout/buy-now}" method="get" style="flex: 1;">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        <input type="hidden" name="quantity" id="buyNowQuantityHidden" value="1">
+                        <button type="submit" class="btn-buy-now" style="width: 100%;">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    <footer>
+        <p>©2025 BlossomLane • Fresh flowers, warm smiles.</p>
+    </footer>
+
+    <script>
+        // Sync quantity with hidden fields
+        const qty = document.getElementById("quantity");
+        const cartHidden = document.getElementById("cartQuantityHidden");
+        const buyHidden = document.getElementById("buyNowQuantityHidden");
+
+        qty.addEventListener("input", () => {
+            cartHidden.value = qty.value;
+            buyHidden.value = qty.value;
+        });
+    </script>
+</body>
+</html>

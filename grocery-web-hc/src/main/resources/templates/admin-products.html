@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products Dashboard • Admin</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    :root { --border:#e5e7eb; --muted:#6b7280; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap:16px; }
+    .card { border:1px solid var(--border); border-radius:12px; padding:12px; background:#fff; box-shadow: 0 6px 16px rgba(17,24,39,0.06) }
+    input, select { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; }
+    .actions { display:flex; gap:8px; }
+    .muted { color: var(--muted); }
+    .fab { position: fixed; right: 24px; bottom: 24px; z-index: 1000; }
+    .button { border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/admin">← Admin</a>
+    <nav>
+      <a href="/admin" class="active">Dashboard</a>
+      <a id="auth-link" href="/login">Login</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>Products Dashboard</h1>
+    <div id="admin-guard" class="error"></div>
+
+    <div class="row" style="margin:10px 0 14px;">
+      <input id="admin-products-search" type="search" placeholder="Search products..." oninput="adminLoadProductsGrid(this.value)" />
+      <span class="muted">Use search to quickly filter products</span>
+    </div>
+
+    <div id="admin-products-grid" class="grid"></div>
+
+    <div class="fab"><button class="button" onclick="adminOpenProductCreate()">+ Add product</button></div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    updateAuthLink();
+    const auth = getAuth();
+    const guard = document.getElementById('admin-guard');
+    if(!auth){ window.location.href = '/login'; }
+    else if(String(auth.role||'').toUpperCase() !== 'ADMIN'){
+      guard.textContent = 'You must be an admin to view this page.';
+    } else {
+      adminLoadProductsGrid('');
+    }
+  </script>
+
+  <!-- Product Edit/Create Modal (reuses app.js handlers and ids) -->
+  <div id="modal-product" class="modal-backdrop" onclick="if(event.target===this) closeModal('modal-product')">
+    <div class="modal" style="background:#fff; padding:18px; border-radius:12px; width: 560px; max-width: calc(100% - 32px); box-shadow: 0 20px 40px rgba(17,24,39,0.2);">
+      <header style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px;">
+        <h3>Edit Product</h3>
+        <span class="close" style="cursor:pointer; font-size: 22px;" onclick="closeModal('modal-product')">×</span>
+      </header>
+      <div class="row"><input id="mp-name" placeholder="Name" /><input id="mp-price" type="number" step="0.01" placeholder="Price" /></div>
+      <div class="row"><input id="mp-unit" placeholder="Unit" /><input id="mp-category" placeholder="Category" /></div>
+      <div class="row"><input id="mp-image" placeholder="Image URL" /></div>
+      <div class="row"><input id="mp-stock" type="number" placeholder="Stock" /><label style="display:flex; gap:6px; align-items:center; flex:0 0 auto"><input id="mp-instock" type="checkbox"/> In stock</label></div>
+      <div class="actions" style="justify-content:flex-end; margin-top:8px;">
+        <button class="button secondary" onclick="closeModal('modal-product')">Cancel</button>
+        <button class="button" onclick="adminSaveProductEdit()">Save</button>
+      </div>
+      <div id="modal-product-error" class="error"></div>
+      <input type="hidden" id="mp-id" />
+    </div>
+  </div>
+</body>
+</html>

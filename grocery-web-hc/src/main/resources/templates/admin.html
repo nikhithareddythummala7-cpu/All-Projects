@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin • FreshCart</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    :root {
+      --bg: #f9fafb;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --muted: #6b7280;
+      --text: #111827;
+      --primary: #2563eb;
+      --primary-600: #1d4ed8;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+    }
+    body { background: var(--bg); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 900px){ .grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--border); padding: 16px; border-radius: 12px; box-shadow: 0 6px 16px rgba(17,24,39,0.06); }
+    .muted { color: var(--muted); }
+    .section-header { display:flex; justify-content: space-between; align-items:center; gap: 12px; margin-bottom: 8px; }
+    .section-header h2 { margin: 0; }
+    .tabs { display:flex; gap: 8px; }
+    .tab { padding: 8px 12px; border: 1px solid var(--border); border-radius: 999px; color: var(--text); text-decoration: none; background: #fff; }
+    .tab:hover { background: #f3f4f6; }
+    .tab.active { background: var(--text); color: #fff; border-color: var(--text); }
+    table { width: 100%; border-collapse: collapse; border-radius: 8px; overflow: hidden; }
+    thead th { background: #f3f4f6; font-weight: 600; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+    .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .row > * { flex: 1; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .button.small { padding: 6px 10px; font-size: 12px; }
+    .button.secondary { background: #fff; border: 1px solid var(--border); color: var(--text); }
+    .button.secondary:hover { background: #f3f4f6; }
+    .select, input, textarea { padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; }
+    .badge { display:inline-block; padding: 4px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .badge.pending { background:#fef3c7; color:#92400e; }
+    .badge.shipped { background:#dbeafe; color:#1e40af; }
+    .badge.delivered { background:#dcfce7; color:#065f46; }
+    .badge.cancelled { background:#fee2e2; color:#991b1b; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+    .modal { background:#fff; padding:18px; border-radius:12px; width: 560px; max-width: calc(100% - 32px); box-shadow: 0 20px 40px rgba(17,24,39,0.2); }
+    .modal header { display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px; }
+    .close { cursor:pointer; font-size: 22px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    .close:hover { background: #f3f4f6; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/">FreshCart</a>
+    <nav>
+      <a href="/admin" class="active">Admin</a>
+      <a id="auth-link" href="/login">Login</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <div class="section-header">
+      <h1>Admin Dashboard</h1>
+      <nav class="tabs">
+        <a class="tab" href="#products">Products</a>
+        <a class="tab" href="#orders">Orders</a>
+        <a class="tab" href="#users">Users</a>
+      </nav>
+    </div>
+    <div id="admin-guard" class="error"></div>
+
+    <div id="products" class="grid">
+      <div class="card">
+        <div class="section-header"><h2>Products</h2><span class="muted">Manage catalog</span></div>
+        <div class="row">
+          <input id="p-name" placeholder="Name" />
+          <input id="p-price" placeholder="Price" type="number" step="0.01" />
+        </div>
+        <div class="row">
+          <input id="p-unit" placeholder="Unit (e.g., kg)" />
+          <input id="p-category" placeholder="Category" />
+        </div>
+        <div class="row">
+          <input id="p-image" placeholder="Image URL or filename" />
+        </div>
+        <div class="row">
+          <input id="p-stock" placeholder="Stock" type="number" />
+          <label class="row" style="flex:0 0 auto; gap:6px; align-items:center;">
+            <input id="p-instock" type="checkbox" checked /> In stock
+          </label>
+          <button class="button" onclick="adminCreateProduct()">Add product</button>
+        </div>
+        <div id="admin-products-error" class="error"></div>
+        <table>
+          <thead>
+            <tr><th>Name</th><th>Price</th><th>Stock</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="admin-products"></tbody>
+        </table>
+      </div>
+
+      <div id="orders" class="card">
+        <div class="section-header"><h2>Orders</h2><span class="muted">Track fulfillment</span></div>
+        <div class="row">
+          <select id="admin-order-filter" class="select" onchange="adminLoadOrders(this.value||'ALL')">
+            <option value="ALL" selected>All</option>
+            <option value="PENDING">Pending</option>
+            <option value="SHIPPED">Shipped</option>
+            <option value="DELIVERED">Delivered</option>
+            <option value="CANCELLED">Cancelled</option>
+          </select>
+        </div>
+        <div id="admin-orders-error" class="error"></div>
+        <div id="admin-orders" class="orders-list"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px; display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <h2 style="margin: 0 0 4px;">Products Dashboard</h2>
+        <div class="muted">Open a visual catalog view to manage product cards</div>
+      </div>
+      <a class="button" href="/admin/products">Open Products Dashboard →</a>
+    </div>
+
+    <div id="users" class="card" style="margin-top:16px;">
+      <div class="section-header"><h2>Users</h2><span class="muted">Manage customers</span></div>
+      <div id="admin-users-error" class="error"></div>
+      <table>
+        <thead>
+          <tr><th>Username</th><th>Email</th><th>Role</th><th>Orders</th></tr>
+        </thead>
+        <tbody id="admin-users"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/js/app.js"></script>
+  <script>
+    updateAuthLink();
+    // Guard admin page
+    const auth = getAuth();
+    const guard = document.getElementById('admin-guard');
+    if(!auth){ window.location.href = '/login'; }
+    else if(String(auth.role).toUpperCase() !== 'ADMIN'){
+      guard.textContent = 'You must be an admin to view this page.';
+      // optional redirect
+      // window.location.href = '/';
+    }else{
+      adminLoadProducts();
+      adminLoadOrders('ALL');
+      adminLoadUsers();
+      adminLoadProductsGrid('');
+    }
+  </script>
+
+  <!-- Product Edit Modal -->
+  <div id="modal-product" class="modal-backdrop" onclick="if(event.target===this) closeModal('modal-product')">
+    <div class="modal">
+      <header>
+        <h3>Edit Product</h3>
+        <span class="close" onclick="closeModal('modal-product')">×</span>
+      </header>
+      <div class="row"><input id="mp-name" placeholder="Name" /><input id="mp-price" type="number" step="0.01" placeholder="Price" /></div>
+      <div class="row"><input id="mp-unit" placeholder="Unit" /><input id="mp-category" placeholder="Category" /></div>
+      <div class="row"><input id="mp-image" placeholder="Image URL" /></div>
+      <div class="row"><input id="mp-stock" type="number" placeholder="Stock" /><label style="display:flex; gap:6px; align-items:center; flex:0 0 auto"><input id="mp-instock" type="checkbox"/> In stock</label></div>
+      <div class="actions" style="justify-content:flex-end; margin-top:8px;">
+        <button class="button secondary" onclick="closeModal('modal-product')">Cancel</button>
+        <button class="button" onclick="adminSaveProductEdit()">Save</button>
+      </div>
+      <div id="modal-product-error" class="error"></div>
+      <input type="hidden" id="mp-id" />
+    </div>
+  </div>
+
+  <!-- Order Details Modal -->
+  <div id="modal-order" class="modal-backdrop" onclick="if(event.target===this) closeModal('modal-order')">
+    <div class="modal">
+      <header>
+        <h3>Order Details</h3>
+        <span class="close" onclick="closeModal('modal-order')">×</span>
+      </header>
+      <div id="mo-body">
+        <!-- filled by JS: id, status, items, totals, address, phone, dates -->
+      </div>
+      <div class="row" style="gap:6px; align-items:center; margin-top:8px;">
+        <label>Status:</label>
+        <select id="mo-status" class="select"></select>
+        <button class="button" onclick="adminSaveOrderStatus()">Update</button>
+      </div>
+      <div id="modal-order-error" class="error"></div>
+      <input type="hidden" id="mo-id" />
+    </div>
+  </div>
+</body>
+</html>

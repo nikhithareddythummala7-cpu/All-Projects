@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting Activity Monitor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .monitor-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .activity-table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        .badge-vote {
+            background-color: #28a745;
+        }
+        .badge-verify {
+            background-color: #17a2b8;
+        }
+        .badge-election {
+            background-color: #ffc107;
+            color: black;
+        }
+        .real-time-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background-color: #28a745;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .activity-type {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 5px;
+        }
+        .type-vote {
+            background-color: #e7f5ff;
+            color: #0066cc;
+        }
+        .type-officer {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .type-election {
+            background-color: #fff3e0;
+            color: #e65100;
+        }
+        .type-system {
+            background-color: #f3e5f5;
+            color: #6a1b9a;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin/dashboard">🛡️ Admin Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/elections">Elections</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/officers">Officers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/voting-activity">Voting Activity</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/audit-logs">Audit Logs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="monitor-container">
+            <!-- Header -->
+            <div class="mb-4">
+                <h1>📊 Voting Activity Monitor</h1>
+                <p class="text-muted">Real-time monitoring of all voting activities across the system</p>
+                <p><span class="real-time-indicator"></span><strong>Live Monitoring</strong> - Updates every activity</p>
+            </div>
+
+            <!-- Real-Time Statistics -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-number" th:text="${totalVotes}">0</div>
+                    <div class="stat-label">Total Votes Cast</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" th:text="${activeElections}">0</div>
+                    <div class="stat-label">Active Elections</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" th:text="${totalVoters}">0</div>
+                    <div class="stat-label">Registered Voters</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" th:text="${overallTurnout + '%'}">0%</div>
+                    <div class="stat-label">Overall Turnout</div>
+                </div>
+            </div>
+
+            <!-- Filter & Information Section -->
+            <div class="filter-section">
+                <h5 class="mb-3">📋 Activity Type Legend</h5>
+                <div>
+                    <span class="activity-type type-vote">🗳️ VOTE_CAST</span>
+                    <span class="activity-type type-vote">✓ VOTE_VERIFIED</span>
+                    <span class="activity-type type-officer">👮 VOTER_APPROVED</span>
+                    <span class="activity-type type-officer">✗ VOTER_REJECTED</span>
+                    <span class="activity-type type-election">📅 ELECTION_CREATED</span>
+                    <span class="activity-type type-election">✏️ ELECTION_UPDATED</span>
+                    <span class="activity-type type-system">🔐 RESULTS_DECLARED</span>
+                </div>
+            </div>
+
+            <!-- Recent Activities Table -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h3 class="mb-3">🔄 Recent Activities (Real-Time)</h3>
+                    <div class="table-responsive activity-table">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Activity Type</th>
+                                    <th>User Role</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="activity : ${recentActivities}">
+                                    <td>
+                                        <strong th:text="${#temporals.format(activity.timestamp, 'MMM dd, HH:mm:ss')}"></strong>
+                                    </td>
+                                    <td>
+                                        <span th:if="${activity.action.contains('VOTE')}" class="activity-type type-vote" th:text="${activity.action}"></span>
+                                        <span th:if="${activity.action.contains('VOTER')}" class="activity-type type-officer" th:text="${activity.action}"></span>
+                                        <span th:if="${activity.action.contains('ELECTION')}" class="activity-type type-election" th:text="${activity.action}"></span>
+                                        <span th:if="${activity.action.contains('RESULTS')}" class="activity-type type-system" th:text="${activity.action}"></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${activity.userRole == 'VOTER' ? 'bg-primary' : activity.userRole == 'ELECTION_OFFICER' ? 'bg-success' : 'bg-danger'}"
+                                              th:text="${activity.userRole}"></span>
+                                    </td>
+                                    <td th:text="${activity.action}"></td>
+                                    <td th:text="${activity.details}"></td>
+                                    <td><small th:text="${activity.ipAddress}"></small></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(recentActivities)}">
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        No voting activities recorded yet
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity by Election Section -->
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <h3 class="mb-3">📈 Activity by Election</h3>
+                    <div class="table-responsive activity-table">
+                        <table class="table table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Election Name</th>
+                                    <th>Status</th>
+                                    <th>Votes Cast</th>
+                                    <th>Total Voters</th>
+                                    <th>Turnout %</th>
+                                    <th>Last Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="election : ${electionActivities}">
+                                    <td><strong th:text="${election.get('electionName')}"></strong></td>
+                                    <td>
+                                        <span class="badge" 
+                                              th:classappend="${election.get('status') == 'ACTIVE' ? 'bg-success' : election.get('status') == 'DRAFT' ? 'bg-secondary' : 'bg-primary'}"
+                                              th:text="${election.get('status')}"></span>
+                                    </td>
+                                    <td th:text="${election.get('voteCount')}"></td>
+                                    <td th:text="${election.get('totalVoters')}"></td>
+                                    <td>
+                                        <strong th:text="${#numbers.formatDecimal(election.get('turnoutPercent'), 1, 2) + '%'}"></strong>
+                                    </td>
+                                    <td><small th:text="${#temporals.format(election.get('lastActivity'), 'MMM dd, HH:mm')}"></small></td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(electionActivities)}">
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        No elections recorded yet
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring Statistics & Alerts -->
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">⚡ Activity Status</h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Active Elections:</strong> <span th:text="${activeElections}"></span></p>
+                            <p><strong>Pending Voter Approvals:</strong> <span th:text="${pendingVoters}"></span></p>
+                            <p><strong>Completed Elections:</strong> <span th:text="${completedElections}"></span></p>
+                            <p><strong>Results Declared:</strong> <span th:text="${resultsDeclared}"></span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">📊 Admin Controls</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>✅ <strong>Monitor System:</strong> View all voting activities in real-time</p>
+                            <p>✅ <strong>Audit Trail:</strong> Complete record of all system actions</p>
+                            <p>✅ <strong>Role Management:</strong> Control officer creation and activation</p>
+                            <p>✅ <strong>Election Control:</strong> Manage all elections and declare results</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Responsibilities Notice -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="alert alert-info" role="alert">
+                        <h5>👨‍💼 Admin Responsibilities Checklist</h5>
+                        <ul class="mb-0">
+                            <li>✓ Monitor all voting activities and detect anomalies</li>
+                            <li>✓ Manage election officers and their access levels</li>
+                            <li>✓ Create, update, and manage elections</li>
+                            <li>✓ Add and manage election candidates</li>
+                            <li>✓ Declare and publish official results</li>
+                            <li>✓ Maintain system security and user roles</li>
+                            <li>✓ Review audit logs for compliance</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <a href="/admin/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+                    <a href="/admin/audit-logs" class="btn btn-outline-primary">View Full Audit Logs</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh voting activity every 5 seconds
+        // Uncomment below for real-time updates
+        // setInterval(function() {
+        //     location.reload();
+        // }, 5000);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

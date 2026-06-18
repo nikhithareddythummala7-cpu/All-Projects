@@ -1,0 +1,123 @@
+@import "../../mixins.scss";
+
+.recipesContainer {
+  background-color: var(--bg2);
+  min-height: 100vh;
+  padding: 20px 0px;
+  h1 {
+    color: var(--text2);
+    text-align: center;
+  }
+  min-height: 100vh;
+  min-width: 300px;
+
+  .recipes {
+    width: 80%;
+    margin: 0px auto;
+    list-style-type: none;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+
+    .recipe {
+      width: fit-content;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+
+      @include md {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .first {
+        order: 2;
+        @include md {
+          order: 1;
+        }
+      }
+      .second {
+        order: 1;
+        @include md {
+          order: 2;
+        }
+      }
+      .left {
+        width: fit-content;
+        .noImage {
+          height: 200px;
+          width: 300px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background-color: var(--bg1);
+          border-radius: 10px;
+          svg {
+            font-size: 40px;
+            color: var(--text1);
+          }
+        }
+        img {
+          height: 200px;
+          width: 300px;
+          object-fit: contain;
+        }
+      }
+      .right {
+        position: relative;
+        padding: 10px;
+        background-color: var(--bg1);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-radius: 10px;
+        width: 300px;
+        padding-bottom: 20px;
+        min-height: 200px;
+        @include md {
+          flex-grow: 1;
+          margin: 0px auto;
+        }
+        .vegan {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background-color: green;
+          width: fit-content;
+          border-radius: 6px;
+          padding: 4px;
+          p {
+            color: white;
+            font-size: 10px;
+          }
+          svg {
+            color: white;
+            font-size: 20px;
+          }
+        }
+        .row {
+          display: flex;
+          gap: 8px;
+          align-items: flex-start;
+          span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text1);
+          }
+          p {
+            font-size: 14px;
+            color: var(--text2);
+          }
+        }
+      }
+    }
+  }
+}

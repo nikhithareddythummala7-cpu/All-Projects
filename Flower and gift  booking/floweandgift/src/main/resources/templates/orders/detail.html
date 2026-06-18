@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body {
+            background-color: #fdf6f9;
+        }
+        .order-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #b03060;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            margin-top: 1.5rem;
+            font-weight: bold;
+            color: #444;
+        }
+        ul li {
+            margin-bottom: 0.5rem;
+        }
+        .back-btn {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .back-btn a {
+            background-color: #b03060;
+            color: white;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .back-btn a:hover {
+            background-color: #90284d;
+        }
+    </style>
+</head>
+<body>
+
+<div class="order-container">
+
+    <h2>Order Details</h2>
+
+    <p><strong>Order ID:</strong> <span th:text="${order.id}"></span></p>
+
+    <p><strong>Status:</strong> <span th:text="${order.status}"></span></p>
+
+    <p><strong>Total Amount:</strong> ₹<span th:text="${order.totalAmount}"></span></p>
+
+    <p>
+        <strong>Delivery Date:</strong>
+        <span th:if="${order.deliveryDateTime != null}"
+              th:text="${#temporals.format(order.deliveryDateTime, 'yyyy-MM-dd HH:mm')}">
+        </span>
+        <span th:if="${order.deliveryDateTime == null}">Not Scheduled</span>
+    </p>
+
+    <p><strong>Special Instructions:</strong>
+        <span th:text="${order.specialInstructions != null ? order.specialInstructions : 'None'}"></span>
+    </p>
+
+    <!-- Delivery Address -->
+    <h3 class="section-title" th:if="${order.deliveryAddress != null}">Delivery Address</h3>
+
+    <div th:if="${order.deliveryAddress != null}">
+        <p>
+            <span th:text="${order.deliveryAddress.street}"></span>,
+            <span th:text="${order.deliveryAddress.city}"></span>,
+            <span th:text="${order.deliveryAddress.state}"></span> -
+            <span th:text="${order.deliveryAddress.zipCode}"></span>
+        </p>
+        
+    </div>
+
+    <div th:if="${order.deliveryAddress == null}">
+        <p><strong>Delivery Address:</strong> Not Provided</p>
+    </div>
+
+
+    <h3 class="section-title">Items</h3>
+    <ul>
+        <li th:each="item : ${order.items}">
+            <span th:text="${item.productName}"></span>
+            ×
+            <span th:text="${item.quantity}"></span>
+            —
+            ₹<span th:text="${item.price}"></span>
+        </li>
+    </ul>
+
+    <div class="back-btn">
+        <a th:href="@{/orders}">Back to Orders</a>
+    </div>
+
+</div>
+
+</body>
+</html>

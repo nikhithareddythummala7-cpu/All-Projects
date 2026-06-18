@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{base :: parent(~{::#content},~{::title},~{::script})}">
+<head>
+    <title data-th-text="${loggedInUser.name} + ' | All Your Contacts | SCM'">All Your Contacts</title>
+</head>
+<body>
+
+<div id="content" class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+
+
+<!--                <div class="d-sm-flex d-block align-items-center justify-content-between mb-4">-->
+<!--                    <div class="mb-3 mb-sm-0">-->
+<!--                        <h5 class="card-title fw-semibold">All Your Contacts</h5>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <select class="form-select" id="feedbackFilter">-->
+<!--                            <option value="all">All Feedbacks</option>-->
+<!--                            <option value="pending">Pending Feedbacks</option>-->
+<!--                            <option value="reviewed">Reviewed Feedbacks</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                </div>-->
+
+                <div class="contacts_container">
+                    <div class="d-sm-flex d-block align-items-center justify-content-between mb-4">
+                        <div class="mb-3 mb-sm-0">
+                            <h5 class="card-title fw-semibold">All Your Contacts</h5>
+                            <div class="form-text text-primary"><span data-th-text="${pageContacts.getTotalElements()+' results found'}"></span></div>
+                        </div>
+                        <form data-th-object="${contactSearchForm}" data-th-action="@{'/user/contacts/search'}">
+                            <div class="d-flex align-items-center">
+                                <select data-th-field="*{field}" name="field" class="form-select me-2" id="field">
+                                    <option selected value="name">Select Field</option>
+                                    <option value="name">Name</option>
+                                    <option value="email">Email Address</option>
+                                    <option value="phone">Phone Number</option>
+                                </select>
+                                <input data-th-field="*{value}" name="keyword" type="text" class="form-control me-2 w-100" id="keyword" placeholder="Search..." aria-label="Search">
+                                <button type="submit" class="btn btn-primary" id="searchButton">Search</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div data-th-replace="~{message :: messagebox}"></div>
+
+                    <div class="table-responsive">
+                        <table data-th-unless="${pageContacts.isEmpty()}" class="table table-hover table-bordered rounded-3 text-nowrap align-middle">
+                            <thead class="table-light">
+                            <tr>
+                                <th class="py-3 px-4">
+                                    <h6 class="fw-semibold mb-0">NAME</h6>
+                                </th>
+                                <th class="py-3 px-4 text-center">
+                                    <h6 class="fw-semibold mb-0">PHONE</h6>
+                                </th>
+                                <th class="py-3 px-4 text-center">
+                                    <h6 class="fw-semibold mb-0">LINKS</h6>
+                                </th>
+                                <th class="py-3 px-4 text-center">
+                                    <h6 class="fw-semibold mb-0">ACTION</h6>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody id="feedbackBody">
+                            <tr data-th-each="contact : ${pageContacts.getContent()}" data-th-object="${contact}">
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center">
+                                        <img data-th-src="@{*{picture}}"
+                                             onerror="this.src='https://e7.pngegg.com/pngimages/81/570/png-clipart-profile-logo-computer-icons-user-user-blue-heroes-thumbnail.png'"
+                                             alt="Avatar"
+                                             class="rounded-circle img-fluid me-3"
+                                             width="50"
+                                             height="50">
+                                        <div>
+                                            <div class="fw-bold fs-6"><span data-th-text="*{name}"></span></div>
+                                            <div class="text-muted small"><span data-th-text="*{email}"></span></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <i class="fa fa-phone me-2" aria-hidden="true"></i><span data-th-text="*{phoneNumber}"></span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <span data-th-if="*{favorite}"><i class="fa-solid fa-circle text-success"></i></span>
+                                        <a data-th-href="@{*{websiteLink}}" class="text-reset" target="_blank"><i class="fa-solid fa-link"></i></a>
+                                        <a data-th-href="@{*{linkedInLink}}" class="text-reset" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <!-- Delete Contact-->
+                                        <a data-th-onclick="deleteContact([[${contact.id}]])" href="javascript:void(0)" class="text-reset">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </a>
+                                        <!-- Update Contact-->
+                                        <a data-th-href="@{'/user/contacts/view/' + ${contact.id}}" class="text-reset">
+                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        </a>
+                                        <!-- View Contact-->
+                                        <a data-th-onclick="openContactModal([[${contact.id}]])" href="javascript:void(0)" class="text-reset">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <div data-th-unless="${pageContacts.isEmpty()}" class="pagination_container d-flex justify-content-center mt-4"> <!-- Flexbox for centering pagination -->
+                            <nav aria-label="...">
+                                <ul class="pagination">
+                                    <li data-th-classappend="${pageContacts.isFirst()} ? 'disabled'" class="page-item">
+                                        <a data-th-href="@{'/user/contacts?size='+${pageSize}+'&page='+${pageContacts.getNumber() - 1}}" class="page-link" tabindex="-1">
+                                            Previous
+                                        </a>
+                                    </li>
+
+                                    <li data-th-each="index : ${#numbers.sequence(0,pageContacts.getTotalPages() - 1)}"
+                                        data-th-classappend="${index == pageContacts.getNumber()} ? 'active'" class="page-item">
+                                        <a data-th-href="@{'/user/contacts?size='+${pageSize}+'&page='+${index}}" class="page-link">
+                                            <span data-th-text="${index + 1}"></span>
+                                        </a>
+                                    </li>
+
+                                    <li data-th-classappend="${pageContacts.isLast()} ? 'disabled'" class="page-item">
+                                        <a data-th-href="@{'/user/contacts?size='+${pageSize}+'&page='+${pageContacts.getNumber() + 1}}" class="page-link">
+                                            Next
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+
+                        <h1 data-th-if="${pageContacts.isEmpty()}" class="text-center pt-4">No result Found</h1>
+
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <div data-th-replace="~{user/contact_modals :: contact}"></div>
+
+</div>
+    <script data-th-src="@{'/js/contacts.js'}"></script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile • Research Publications</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <h2>My Profile</h2>
+      <form id="profileForm" class="card" style="max-width:600px">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="Your name" />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="email" placeholder="you@example.com" />
+        </div>
+        <div class="field">
+          <label>About</label>
+          <textarea name="about" rows="4" placeholder="A little bit about you..."></textarea>
+        </div>
+        <div class="field">
+          <label>Avatar URL</label>
+          <input type="url" name="avatarUrl" placeholder="https://..." />
+        </div>
+        <div class="field">
+          <label>Domain</label>
+          <input type="text" name="domain" placeholder="e.g., AI" />
+        </div>
+        <div class="field">
+          <label>Qualification</label>
+          <input type="text" name="qualification" placeholder="e.g., MSc, PhD" />
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn">Save Profile</button>
+        </div>
+      </form>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

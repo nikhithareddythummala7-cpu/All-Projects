@@ -1,0 +1,18 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="siteHeader">
+  <header class="site-header">
+    <div class="container">
+      <a th:href="@{/}" class="brand">Research Publication App</a>
+      <nav class="nav">
+        <a th:href="@{/publications}" id="publicationsLink">Publications</a>
+        <a th:href="@{/search}" id="searchLink">Search</a>
+        <a th:href="@{/submit}" id="submitLink">Submit</a>
+        <a th:href="@{/my-publications}" id="myPubsLink" style="display:none">My Publications</a>
+        <a th:href="@{/profile}" id="profileLink" style="display:none">Profile</a>
+        <a th:href="@{/admin}" id="adminLink" style="display:none">Admin</a>
+        <a th:href="@{/login}" id="loginLink">Login</a>
+        <a th:href="@{/register}" class="btn" id="registerLink">Register</a>
+        <a href="#" id="logoutLink" style="display:none" class="btn">Logout</a>
+      </nav>
+    </div>
+  </header>
+</div>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sign Up • FreshCart</title>
+	<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+	<header class="site-header">
+		<a class="logo" href="/">FreshCart</a>
+	</header>
+	<main class="container auth">
+		<h1>Create your account</h1>
+		<form id="signup-form">
+			<label>Username
+				<input type="text" id="signup-username" required>
+			</label>
+			<label>Email
+				<input type="email" id="signup-email" required>
+			</label>
+			<label>Role
+				<select id="signup-role">
+					<option value="USER" selected>User</option>
+					<option value="ADMIN">Admin</option>
+				</select>
+			</label>
+			<label>Password
+				<input type="password" id="signup-password" required>
+			</label>
+			<button class="button" type="submit">Create account</button>
+		</form>
+		<p>Already have an account? <a href="/login">Login</a></p>
+		<div id="signup-error" class="error"></div>
+	</main>
+	<script src="/js/app.js"></script>
+	<script>
+		document.getElementById('signup-form').addEventListener('submit', handleSignupSubmit);
+	</script>
+</body>
+</html>
+
+

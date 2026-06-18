@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" data-th-replace="~{base :: parent(~{::#content},~{::title},~{})}">
+<head>
+    <title data-th-text="${loggedInUser.name} + ' | Profile | SCM'">Profile Page</title>
+</head>
+<body>
+
+<div id="content" class="container-fluid">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title fw-semibold mb-4">Profile</h5>
+
+<!--                <div class="col-md-4">-->
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title" data-th-text="${loggedInUser.name}"></h5>
+                            <h6 class="card-subtitle mb-2 text-muted" data-th-text="${loggedInUser.email}"></h6>
+                            <p class="card-text" data-th-text="${loggedInUser.about}"></p>
+                        </div>
+                    </div>
+<!--                </div>-->
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

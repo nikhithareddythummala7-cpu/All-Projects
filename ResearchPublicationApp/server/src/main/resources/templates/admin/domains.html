@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin • Domains</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <h2>Domains</h2>
+      <form id="domainForm" class="card" style="max-width:600px; margin-bottom: 1rem">
+        <input type="hidden" name="id" />
+        <div class="field">
+          <label>Name</label>
+          <input type="text" name="name" required />
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <input type="text" name="description" />
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn">Save</button>
+        </div>
+      </form>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="domainsTable"></tbody>
+      </table>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+    <script src="/js/app.js"></script>
+  </body>
+</html>

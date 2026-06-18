@@ -1,0 +1,269 @@
+@import "../../mixins.scss";
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  .recipes {
+    overflow-y: auto;
+    background-color: var(--bg1);
+    width: 80%;
+    max-width: 700px;
+    height: fit-content;
+    position: relative;
+    padding: 10px;
+    padding-bottom: 20px;
+    .modalRecipeContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      .row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        .close {
+          color: var(--text1);
+          font-size: 24px;
+        }
+        h1 {
+          color: var(--text1);
+          font-size: 24px;
+        }
+      }
+
+      .favorites {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        .recipe {
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          align-items: center;
+          width: 200px;
+          .image {
+            .noImage {
+              height: 200px;
+              width: 300px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background-color: var(--bg1);
+              border-radius: 10px;
+              svg {
+                font-size: 40px;
+                color: var(--text1);
+              }
+            }
+            img {
+              height: 100px;
+              width: 200px;
+              object-fit: contain;
+            }
+          }
+          p {
+            font-weight: 500;
+            color: var(--text1);
+            border-bottom: 2px solid var(--text2);
+            margin-bottom: 4px;
+            font-size: 12px;
+            width: fit-content;
+            @include md {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+
+      .empty {
+        align-self: center;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        justify-content: center;
+        height: 50vh;
+        svg {
+          font-size: 50px;
+        }
+        h1 {
+          font-size: 30px;
+        }
+        span {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+.planContainer {
+  min-height: 100vh;
+  min-width: 300px;
+  background-color: var(--bg2);
+  color: var(--text1);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+  .heading {
+    background-color: tomato;
+    color: white;
+    text-align: center;
+  }
+  .packer {
+    margin-top: 10px;
+    align-self: center;
+    width: 80%;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    .dateContainer {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      align-self: center;
+      .row {
+        display: flex;
+
+        align-items: center;
+        flex-direction: column;
+      }
+      .date {
+        color: var(--text1);
+        font-weight: 500;
+      }
+      svg {
+        font-size: 20px;
+      }
+    }
+    input {
+      border: none;
+      background-color: var(--bg1);
+      padding: 6px;
+      border: 1px solid var(--text2);
+      border-radius: 10px;
+      &::placeholder {
+        display: none;
+      }
+    }
+    .nutrition {
+      width: 80%;
+
+      @include md {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+      }
+      .row {
+        gap: 6px;
+
+        span {
+          font-weight: 500;
+          font-size: 186x;
+        }
+        @include md {
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
+
+    .plan {
+      width: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 10px;
+
+      @include md {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .col {
+        width: fit-content;
+        .row {
+          display: flex;
+          justify-content: space-between;
+          h1 {
+            font-size: 20px;
+          }
+          .close {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: tomato;
+            border-radius: 100%;
+            padding: 2px;
+            svg {
+              font-size: 14px;
+              color: white;
+            }
+          }
+        }
+        .meal {
+          .image {
+            img {
+              height: 200px;
+              width: 300px;
+              object-fit: contain;
+            }
+            .noImage {
+              height: 200px;
+              width: 300px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background-color: var(--bg1);
+              border-radius: 10px;
+              svg {
+                font-size: 40px;
+                color: var(--text1);
+              }
+            }
+          }
+        }
+
+        .add {
+          background-color: var(--bg1);
+          width: 300px;
+          height: 200px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          justify-content: center;
+          border-radius: 10px;
+          svg {
+            font-size: 30px;
+          }
+        }
+      }
+    }
+    button {
+      width: 80%;
+      background-color: tomato;
+      color: white;
+      border: none;
+      height: 30px;
+      border-radius: 8px;
+      max-width: 200px;
+    }
+  }
+}

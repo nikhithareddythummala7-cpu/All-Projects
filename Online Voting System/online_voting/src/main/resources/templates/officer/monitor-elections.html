@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Elections</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .monitor-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .election-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .election-card:hover {
+            box-shadow: 0 5px 20px rgba(245, 87, 108, 0.2);
+            border-color: #f5576c;
+        }
+        .election-card.active {
+            border-left: 5px solid #28a745;
+            background-color: #f0fdf4;
+        }
+        .election-card.completed {
+            border-left: 5px solid #6c757d;
+            background-color: #f8f9fa;
+        }
+        .badge-active {
+            background-color: #28a745 !important;
+        }
+        .badge-completed {
+            background-color: #6c757d !important;
+        }
+        .status-badge {
+            display: inline-block;
+            font-size: 0.9rem;
+            padding: 0.5rem 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/officer/dashboard">👮 Election Officer Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/officer/verify-voters">Verify Voters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/officer/monitor-elections">Monitor Elections</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/officer/turnout-report">Turnout Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="monitor-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1>📊 Monitor Elections</h1>
+                    <p class="text-muted">Track live voting progress and vote counts</p>
+                </div>
+                <a href="/officer/dashboard" class="btn btn-outline-secondary">← Back to Dashboard</a>
+            </div>
+
+            <!-- Active Elections Section -->
+            <h3 class="mb-3">🟢 Active Elections (Live)</h3>
+            
+            <div th:if="${activeElections.isEmpty()}" class="alert alert-info">
+                No active elections at the moment.
+            </div>
+
+            <div th:unless="${activeElections.isEmpty()}">
+                <div th:each="election : ${activeElections}" class="election-card active">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 th:text="${election.name}"></h5>
+                            <p class="text-muted mb-1" th:text="${election.description}"></p>
+                            <small class="text-muted">
+                                Start: <span th:text="${#temporals.format(election.startDate, 'dd MMM HH:mm')}"></span> | 
+                                End: <span th:text="${#temporals.format(election.endDate, 'dd MMM HH:mm')}"></span>
+                            </small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <span class="badge badge-active status-badge">🟢 ACTIVE</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <a th:href="@{'/officer/election-progress/' + ${election.id}}" class="btn btn-sm btn-primary">
+                                View Progress →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Elections Section -->
+            <h3 class="mt-5 mb-3">⚪ Completed Elections</h3>
+            
+            <div th:if="${completedElections.isEmpty()}" class="alert alert-info">
+                No completed elections yet.
+            </div>
+
+            <div th:unless="${completedElections.isEmpty()}">
+                <div th:each="election : ${completedElections}" class="election-card completed">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h5 th:text="${election.name}"></h5>
+                            <p class="text-muted mb-1" th:text="${election.description}"></p>
+                            <small class="text-muted">
+                                Completed: <span th:text="${#temporals.format(election.endDate, 'dd MMM yyyy')}"></span>
+                            </small>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center">
+                                <span class="badge badge-completed status-badge">⚪ COMPLETED</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <a th:href="@{'/officer/election-progress/' + ${election.id}}" class="btn btn-sm btn-secondary">
+                                View Results →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Election Rules Section -->
+            <div class="row mt-5">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <h5>📋 Election Rules to Monitor</h5>
+                        <ul class="mb-0">
+                            <li><strong>Voting Window:</strong> Ensure voting occurs only within the scheduled time</li>
+                            <li><strong>One Vote Per Voter:</strong> Verify each voter votes only once per election</li>
+                            <li><strong>Candidate Integrity:</strong> Ensure all candidates are listed correctly</li>
+                            <li><strong>Vote Count Accuracy:</strong> Monitor vote counts for discrepancies</li>
+                            <li><strong>Election Status:</strong> Track election progression (Active → Completed)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Note -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        <h5>⚠️ Note</h5>
+                        <p class="mb-0">You can view live vote counts for monitoring purposes only. You <strong>CANNOT</strong> modify votes or declare official results. Only an Administrator can declare official election results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

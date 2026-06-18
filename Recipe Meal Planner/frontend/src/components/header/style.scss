@@ -1,0 +1,170 @@
+@import "../../mixins.scss";
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: var(--bg1);
+  height: 60px;
+  min-width: 300px;
+  .logo {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    .icon {
+      height: 40px;
+      width: 40px;
+      border-radius: 100%;
+    }
+
+    p {
+      color: var(--text1);
+      font-size: 20px;
+      letter-spacing: 0.5px;
+      font-weight: 500;
+    }
+  }
+
+  .navbarMenu {
+    z-index: 999;
+    background-color: var(--bg1);
+    position: absolute;
+    right: 10px;
+    top: 64px;
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    color: var(--text1);
+    gap: 10px;
+    padding: 10px;
+    border: 2px solid var(--text2);
+    border-radius: 8px;
+    li {
+      cursor: pointer;
+      svg {
+        font-size: 30px;
+        color: var(--text2);
+      }
+    }
+    @include md {
+      display: none;
+    }
+  }
+
+  .menu {
+    display: none;
+    align-items: center;
+    width: 60%;
+    list-style-type: none;
+    @include md {
+      display: flex;
+      justify-content: space-between;
+    }
+    li {
+      cursor: pointer;
+      svg {
+        font-size: 30px;
+        color: var(--text1);
+      }
+    }
+    .search {
+      width: 50%;
+      .menuSearchContainer {
+        width: 100%;
+        background-color: var(--bg2);
+        height: 40px;
+        display: flex;
+        align-items: center;
+        border-radius: 6px;
+
+        input {
+          width: 90%;
+          background-color: transparent;
+          border: none;
+          height: 40px;
+          padding-left: 10px;
+          color: var(--text1);
+          font-size: 14px;
+          outline: none;
+          &::placeholder {
+            color: var(--text1);
+            opacity: 0.6;
+          }
+        }
+        .searchButton {
+          width: 10%;
+          height: 40px;
+          background-color: transparent;
+          border: none;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          svg {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+  }
+
+  .menuButton {
+    position: relative;
+    background-color: transparent;
+    border: none;
+    @include md {
+      display: none;
+    }
+    svg {
+      font-size: 24px;
+      color: var(--text1);
+    }
+  }
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-width: 300px;
+  background-color: var(--bg2);
+  padding: 10px;
+  @include md {
+    display: none;
+  }
+  input {
+    width: 50%;
+    background-color: var(--bg1);
+    border: none;
+    height: 40px;
+    padding-left: 10px;
+    color: var(--text1);
+    font-size: 14px;
+    outline: none;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    &::placeholder {
+      color: var(--text1);
+      opacity: 0.6;
+    }
+  }
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bg1);
+    width: 40px;
+    border: none;
+    height: 40px;
+    color: var(--text1);
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border: 1px solid var(--text1);
+    svg {
+      font-size: 20px;
+    }
+  }
+}

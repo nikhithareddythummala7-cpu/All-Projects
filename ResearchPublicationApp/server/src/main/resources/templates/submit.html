@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Submit Publication • Research Publications</title>
+    <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div th:insert="fragments/header :: siteHeader"></div>
+    <main class="container">
+      <h2>Submit a New Publication</h2>
+      <form id="submitForm" class="form">
+        <label>Title
+          <input type="text" name="title" required />
+        </label>
+        <label>Description
+          <input type="text" name="description" required />
+        </label>
+        <label>Banner Image URL
+          <input type="text" name="bannerImg" placeholder="https://..." />
+        </label>
+        <label>Domain
+          <input type="text" name="domain" placeholder="e.g., AI, Biology" required />
+        </label>
+        <label>Keywords (comma separated)
+          <input type="text" name="keywords" placeholder="ml, prediction, dataset" />
+        </label>
+        <label>Author Name
+          <input type="text" name="author" required />
+        </label>
+        <label>Author ID
+          <input type="text" name="authorId" required />
+        </label>
+        <label>Published Date
+          <input type="date" name="publishedDate" required />
+        </label>
+        <label>PDF File
+          <input type="file" name="file" accept="application/pdf" required />
+        </label>
+        <button class="btn" type="submit">Submit Publication</button>
+      </form>
+    </main>
+    <div th:insert="fragments/footer :: siteFooter"></div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+{
+  "cartApiTesting": {
+    "testScenarios": [
+      {
+        "id": "TC001",
+        "name": "Add Item to Cart - Success",
+        "endpoint": "POST /api/cart",
+        "request": {
+          "userId": 1,
+          "productId": 1,
+          "quantity": 2
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": {
+            "id": 1,
+            "user": { "id": 1 },
+            "product": { "id": 1, "name": "Test Product", "price": 10.99 },
+            "quantity": 2
+          }
+        },
+        "description": "Add a valid product to user's cart"
+      },
+      {
+        "id": "TC002",
+        "name": "Add Item to Cart - Insufficient Stock",
+        "endpoint": "POST /api/cart",
+        "request": {
+          "userId": 1,
+          "productId": 1,
+          "quantity": 200
+        },
+        "expectedResponse": {
+          "status": 400,
+          "body": "Error adding to cart: Insufficient stock. Available: 100"
+        },
+        "description": "Attempt to add more items than available stock"
+      },
+      {
+        "id": "TC003",
+        "name": "Get User Cart Items",
+        "endpoint": "GET /api/cart/{userId}",
+        "request": {
+          "userId": 1
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": [
+            {
+              "id": 1,
+              "product": { "id": 1, "name": "Test Product", "price": 10.99 },
+              "quantity": 2
+            }
+          ]
+        },
+        "description": "Retrieve all items in user's cart"
+      },
+      {
+        "id": "TC004",
+        "name": "Update Cart Item Quantity",
+        "endpoint": "PUT /api/cart/{itemId}",
+        "request": {
+          "itemId": 1,
+          "quantity": 5
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": {
+            "id": 1,
+            "quantity": 5
+          }
+        },
+        "description": "Update quantity of existing cart item"
+      },
+      {
+        "id": "TC005",
+        "name": "Remove Cart Item",
+        "endpoint": "DELETE /api/cart/{itemId}",
+        "request": {
+          "itemId": 1
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": "Item removed from cart successfully"
+        },
+        "description": "Remove item from cart"
+      },
+      {
+        "id": "TC006",
+        "name": "Calculate Cart Total",
+        "endpoint": "GET /api/cart/total/{userId}",
+        "request": {
+          "userId": 1
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": 21.98
+        },
+        "description": "Calculate total price of items in cart"
+      },
+      {
+        "id": "TC007",
+        "name": "Get Cart Item Count",
+        "endpoint": "GET /api/cart/count/{userId}",
+        "request": {
+          "userId": 1
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": 2
+        },
+        "description": "Get total quantity of items in cart"
+      },
+      {
+        "id": "TC008",
+        "name": "Clear User Cart",
+        "endpoint": "DELETE /api/cart/user/{userId}",
+        "request": {
+          "userId": 1
+        },
+        "expectedResponse": {
+          "status": 200,
+          "body": "Cart cleared successfully"
+        },
+        "description": "Remove all items from user's cart"
+      }
+    ],
+    "testData": {
+      "users": [
+        {
+          "id": 1,
+          "username": "testuser",
+          "email": "test@example.com",
+          "role": "ROLE_USER"
+        }
+      ],
+      "products": [
+        {
+          "id": 1,
+          "name": "Test Product",
+          "price": 10.99,
+          "stock": 100
+        }
+      ]
+    },
+    "authentication": {
+      "required": true,
+      "role": "ROLE_USER",
+      "jwtToken": "Bearer <token>"
+    },
+    "testEnvironment": {
+      "baseUrl": "http://localhost:8080",
+      "database": "H2 in-memory (test)"
+    }
+  }
+}

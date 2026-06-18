@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>User Profile</h1>
+    <nav>
+        <a th:href="@{/}">Home</a>
+        <a th:href="@{/products}">Products</a>
+        <a th:href="@{/cart}">Cart</a>
+        <a th:href="@{/orders}">Orders</a>
+        <a th:href="@{/user/profile}">Profile</a>
+        <a th:href="@{/admin}" sec:authorize="hasRole('ADMIN')">Admin</a>
+        <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
+        <a th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <div class="page-container">
+
+        <div class="card" style="max-width: 500px; margin: auto;">
+            <h2 style="margin-bottom: 1rem;">My Profile</h2>
+
+            <!-- PROFILE FORM -->
+            <form th:action="@{/user/profile}" method="post" class="profile-form">
+
+                <label>First Name:</label>
+                <input type="text" name="firstName" th:value="${user.firstName}" required>
+
+                <label>Last Name:</label>
+                <input type="text" name="lastName" th:value="${user.lastName}" required>
+
+                <label>Email:</label>
+                <input type="email" name="email" th:value="${user.email}" required>
+
+                <label>Phone:</label>
+                <input type="tel" name="phone" th:value="${user.phone}" required>
+
+                <button type="submit" class="btn-primary">Update Profile</button>
+            </form>
+
+            <div style="margin-top: 1.2rem;">
+                <a class="btn-secondary" th:href="@{/user/addresses}">Manage Addresses</a>
+            </div>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 BlossomLane • Fresh flowers, warm smiles.</p>
+</footer>
+
+<script th:src="@{/js/script.js}"></script>
+
+</body>
+</html>

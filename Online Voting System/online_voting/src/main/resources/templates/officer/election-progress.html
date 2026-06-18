@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election Progress</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .progress-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .stats-section {
+            background: #f0f8ff;
+            border-left: 5px solid #0066cc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f5576c;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        .candidate-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        .candidate-card:hover {
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.1);
+        }
+        .progress {
+            height: 40px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            font-weight: bold;
+            line-height: 40px;
+            color: white;
+        }
+        .vote-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f5576c;
+        }
+        .refresh-notice {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/officer/dashboard">👮 Election Officer Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/officer/verify-voters">Verify Voters</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/officer/monitor-elections">Monitor Elections</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/officer/turnout-report">Turnout Reports</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="progress-container">
+            <div class="mb-4">
+                <a href="/officer/monitor-elections" class="btn btn-outline-secondary btn-sm mb-3">← Back to Elections</a>
+                <h1 th:text="${election.name}"></h1>
+                <p class="text-muted" th:text="${election.description}"></p>
+            </div>
+
+            <!-- Live Updates Notice -->
+            <div class="refresh-notice">
+                <strong>🔄 Live Monitoring:</strong> This page shows real-time vote counts. Refresh to see the latest data.
+            </div>
+
+            <!-- Election Statistics -->
+            <div class="stats-section">
+                <div class="row">
+                    <div class="col-md-3 stat-box">
+                        <div class="stat-number" th:text="${totalVotes}">0</div>
+                        <div class="stat-label">Votes Cast</div>
+                    </div>
+                    <div class="col-md-3 stat-box">
+                        <div class="stat-number" th:text="${totalVoters}">0</div>
+                        <div class="stat-label">Total Voters</div>
+                    </div>
+                    <div class="col-md-3 stat-box">
+                        <div class="stat-number" th:text="${turnout + '%'}">0%</div>
+                        <div class="stat-label">Voter Turnout</div>
+                    </div>
+                    <div class="col-md-3 stat-box">
+                        <div class="stat-number" th:text="${candidates.size()}">0</div>
+                        <div class="stat-label">Candidates</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Voting Progress Section -->
+            <h3 class="mt-4 mb-3">📊 Voting Progress by Candidate</h3>
+
+            <div th:if="${candidates.isEmpty()}" class="alert alert-info">
+                No candidates have been added for this election yet.
+            </div>
+
+            <div th:unless="${candidates.isEmpty()}">
+                <div th:each="candidate : ${candidates}" class="candidate-card">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <h5 th:text="${candidate.name}"></h5>
+                            <p class="text-muted mb-0" th:text="${candidate.party}"></p>
+                            <small>Symbol: <strong th:text="${candidate.symbol}"></strong></small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="progress">
+                                <div class="progress-bar" 
+                                     role="progressbar" 
+                                     th:style="${'width: ' + ((totalVotes > 0 && candidate.voteCount > 0) ? (candidate.voteCount * 100) / totalVotes : 0) + '%'}"
+                                     th:text="${candidate.voteCount + ' vote' + (candidate.voteCount != 1 ? 's' : '')}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 text-end">
+                            <div class="vote-count" th:text="${candidate.voteCount}">0</div>
+                            <small class="text-muted" th:text="${totalVotes > 0 ? #numbers.formatDecimal((candidate.voteCount * 100) / totalVotes, 1, 2) + '%' : '0.00%'}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Turnout Progress -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h3>📈 Turnout Progress</h3>
+                    <div class="card">
+                        <div class="card-body">
+                            <p><strong>Votes Cast:</strong> <span th:text="${totalVotes}"></span></p>
+                            <p><strong>Registered Voters:</strong> <span th:text="${totalVoters}"></span></p>
+                            <p><strong>Turnout Percentage:</strong> <span th:text="${turnout + '%'}"></span></p>
+
+                            <div class="progress" style="height: 30px;">
+                                <div class="progress-bar" 
+                                     role="progressbar" 
+                                     th:style="${'width: ' + turnout + '%'}"
+                                     th:text="${turnout + '%'}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Election Details -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <h3>ℹ️ Election Details</h3>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="mb-1"><strong>Status:</strong> <span class="badge bg-primary" th:text="${election.status}"></span></p>
+                            <p class="mb-1"><strong>Start Time:</strong> <span th:text="${#temporals.format(election.startDate, 'dd MMM yyyy HH:mm:ss')}"></span></p>
+                            <p class="mb-1"><strong>End Time:</strong> <span th:text="${#temporals.format(election.endDate, 'dd MMM yyyy HH:mm:ss')}"></span></p>
+                            <p class="mb-0"><strong>Total Candidates:</strong> <span th:text="${candidates.size()}"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitoring Instructions -->
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <h5>📋 Monitoring Guidelines</h5>
+                        <ul class="mb-0">
+                            <li><strong>Vote Counts:</strong> Track the real-time vote distribution among candidates</li>
+                            <li><strong>Turnout:</strong> Monitor voter participation percentage</li>
+                            <li><strong>Vote Verification:</strong> Ensure no anomalies in vote counts</li>
+                            <li><strong>Election Rules:</strong> Verify that each voter votes only once (enforced by system)</li>
+                            <li><strong>Reports:</strong> Generate official reports after voting concludes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restrictions Note -->
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <div class="alert alert-warning">
+                        <h5>🔒 Restrictions</h5>
+                        <ul class="mb-0">
+                            <li>You can <strong>VIEW</strong> vote counts for monitoring only</li>
+                            <li>You <strong>CANNOT</strong> modify, delete, or tamper with votes</li>
+                            <li>You <strong>CANNOT</strong> declare official results (Admin only)</li>
+                            <li>All your monitoring actions are logged for audit purposes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="/officer/monitor-elections" class="btn btn-secondary">← Back to Elections</a>
+                <a href="/officer/dashboard" class="btn btn-outline-primary">Dashboard</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh the page every 10 seconds to show live updates
+        // Uncomment the line below to enable auto-refresh
+        // setInterval(function() { location.reload(); }, 10000);
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

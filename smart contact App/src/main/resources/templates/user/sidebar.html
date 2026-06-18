@@ -1,0 +1,52 @@
+<aside data-th-fragment="sidebar" class="left-sidebar">
+    <!-- Sidebar scroll-->
+    <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+            <a data-th-href="@{'/user/dashboard'}" class="text-nowrap logo-img">
+                <img data-th-src="@{'/images/logos/scm.svg'}" width="180" alt="" />
+            </a>
+            <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+                <i class="ti ti-x fs-8"></i>
+            </div>
+        </div>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+            <ul id="sidebarnav">
+                <li class="sidebar-item">
+                    <a class="sidebar-link" data-th-href="@{'/user/dashboard'}" aria-expanded="false">
+                        <span>
+                        <i class="fa fa-tachometer"></i>
+                        </span>
+                        <span class="hide-menu">Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" data-th-href="@{'/user/profile'}" aria-expanded="false">
+                        <span>
+                        <i class="fa fa-user-circle"></i>
+                        </span>
+                        <span class="hide-menu">Profile</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" data-th-href="@{'/user/contacts/add'}" aria-expanded="false">
+                        <span>
+                        <i class="fa fa-plus-circle"></i>
+                        </span>
+                        <span class="hide-menu">Add Contact</span>
+                    </a>
+                </li>
+                <li class="sidebar-item">
+                    <a class="sidebar-link" data-th-classappend="${currentPage == 'contactsView' || currentPage == 'contactsSearch'} ? 'active'" data-th-href="@{'/user/contacts'}" aria-expanded="false">
+                        <span>
+                        <i class="fa fa-address-book"></i>
+                        </span>
+                        <span class="hide-menu">Contacts</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- End Sidebar navigation -->
+    </div>
+    <!-- End Sidebar scroll-->
+</aside>

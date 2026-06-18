@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>Admin Dashboard</h1>
+    <nav>
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/products}">Products</a>
+        <a th:href="@{/admin/orders}">Orders</a>
+        <a th:href="@{/admin/users}">Users</a>
+        <a th:href="@{/logout}">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <div class="admin-container">
+
+        <!-- METRICS SECTION -->
+        <section class="dashboard-metrics">
+            <div class="metric-card">
+                <h3>Total Orders</h3>
+                <p th:text="${totalOrders}"></p>
+            </div>
+
+            <div class="metric-card">
+                <h3>Total Sales</h3>
+                <p>₹<span th:text="${totalSales}"></span></p>
+            </div>
+        </section>
+
+        <!-- RECENT ORDERS TABLE -->
+        <section class="recent-orders">
+            <h2>Recent Orders</h2>
+
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr th:each="order : ${recentOrders}">
+                        <td th:text="${order.id}"></td>
+                        <td th:text="${order.status}"></td>
+                        <td>₹<span th:text="${order.totalAmount}"></span></td>
+                        <td th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd')}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2025 BlossomLane • Fresh flowers, warm smiles.</p>
+</footer>
+
+<script th:src="@{/js/script.js}"></script>
+
+</body>
+</html>

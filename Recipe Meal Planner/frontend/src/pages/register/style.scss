@@ -1,0 +1,151 @@
+@import "../../mixins.scss";
+
+.registerContainer {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-height: 100vh;
+  color: var(--text1);
+  width: 100%;
+  min-width: 300px;
+  background-image: url("../../assets/register.jpg");
+  background-position: center;
+  background-size: cover;
+  background-color: orange;
+  @include md {
+    align-items: flex-end;
+    padding-right: 10%;
+    background-position: left;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .formContainer {
+    .logo {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      .icon {
+        height: 40px;
+        width: 40px;
+        border-radius: 100%;
+      }
+      p {
+        color: var(--text1);
+        font-size: 20px;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+      }
+    }
+    position: relative;
+    background-color: var(--bg2);
+    padding: 24px 0px;
+    width: 80%;
+    max-width: 500px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    z-index: 999;
+    .loginTitle {
+      font-size: 14px;
+      margin: 0;
+      font-weight: 500;
+      color: var(--text1);
+      @include md {
+        font-size: 16px;
+      }
+    }
+    .inputContainer {
+      display: flex;
+      flex-direction: column;
+      width: 80%;
+      label {
+        margin-bottom: 10px;
+        font-weight: 500;
+        color: var(--textColor);
+        letter-spacing: 0.5px;
+        font-size: 12px;
+        @include md {
+          font-size: 14px;
+        }
+      }
+      input {
+        border: none;
+        height: 40px;
+        padding: 0px 10px;
+        border-radius: 6px;
+        color: var(--text1);
+        background-color: var(--bg1);
+        font-weight: 500;
+        outline: none;
+        font-size: 12px;
+        @include md {
+          font-size: 14px;
+        }
+        &:focus {
+          border: 2px crimson solid;
+        }
+
+        &::-webkit-input-placeholder {
+          color: var(--text2);
+          font-weight: 400;
+        }
+      }
+    }
+    .checkbox {
+      width: 80%;
+      display: flex;
+      align-items: center;
+      input {
+        height: 16px;
+        width: 16px;
+      }
+      label {
+        margin-left: 8px;
+        font-size: 12px;
+        @include md {
+          font-size: 14px;
+        }
+      }
+    }
+
+    p {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text1);
+      @include md {
+        font-size: 14px;
+      }
+      span {
+        margin-left: 10px;
+        color: tomato;
+        font-weight: 500;
+        font-size: 14px;
+        @include md {
+          font-size: 16px;
+        }
+      }
+    }
+    button {
+      cursor: pointer;
+      outline: none;
+      height: 30px;
+      border: none;
+      font-size: 12px;
+      border-radius: 6px;
+      background: tomato;
+      color: white;
+      font-weight: 400;
+      letter-spacing: 0.6px;
+      padding: 0px 10px;
+      @include md {
+        font-size: 14px;
+      }
+    }
+  }
+}

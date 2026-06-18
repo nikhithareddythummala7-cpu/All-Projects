@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Manage Orders</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <h1>Admin Panel - Orders</h1>
+    <nav>
+        <a th:href="@{/admin}">Dashboard</a>
+        <a th:href="@{/admin/products}">Products</a>
+        <a th:href="@{/admin/orders}">Orders</a>
+        <a th:href="@{/admin/users}">Users</a>
+        <a th:href="@{/logout}">Logout</a>
+    </nav>
+</header>
+
+<main>
+    <div class="admin-container">
+
+        <h2>All Orders</h2>
+
+        <!-- Orders Table -->
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>User ID</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="order : ${orders}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.userId}"></td>
+                    <td>₹<span th:text="${order.totalAmount}"></span></td>
+                    <td th:text="${order.status}"></td>
+
+                    <td class="admin-actions">
+                        <form class="order-status-form"
+                              th:action="@{/admin/orders/{id}/status(id=${order.id})}"
+                              method="post">
+
+                            <select name="status">
+                                <option th:each="status : ${T(com.example.floweandgift.model.Order.OrderStatus).values()}"
+                                        th:value="${status}"
+                                        th:text="${status}"
+                                        th:selected="${status == order.status}">
+                                </option>
+                            </select>
+
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</main>
+
+<footer>
+    <p>&copy;2025 BlossomLane • Fresh flowers, warm smiles.</p>
+</footer>
+
+<script th:src="@{/js/script.js}"></script>
+
+</body>
+</html>
