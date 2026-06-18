@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Update Profile - Medly Pharma</title>
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.25);
+        }
+        .readonly-field {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+        .btn-update {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-update:hover {
+            opacity: 0.9;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container profile-container">
+        <div class="profile-card">
+            <h1>Update Profile</h1>
+            <p>Welcome, <span th:text="${fullName}">User</span>! Manage your account information.</p>
+
+            <div id="message" style="display: none;"></div>
+
+            <form id="profileForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" class="form-control"
+                           th:value="${user.fullName}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control readonly-field"
+                           th:value="${user.email}" readonly>
+                    <small class="text-muted">Email cannot be changed</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number</label>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" class="form-control"
+                           th:value="${user.phoneNumber}" placeholder="Enter your phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address" class="form-control" rows="3"
+                              placeholder="Enter your full address" th:text="${user.address}"></textarea>
+                </div>
+
+                <button type="submit" class="btn-update">Update Profile</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profileForm');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = {
+            fullName: formData.get('fullName'),
+            phoneNumber: formData.get('phoneNumber'),
+            address: formData.get('address')
+        };
+
+        // Get user ID from the form (assuming it's in a hidden field or from URL)
+        const userId = getUserIdFromPage();
+
+        fetch('/api/users/' + userId, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Update failed');
+            }
+        })
+        .then(data => {
+            showMessage('Profile updated successfully!', 'success');
+            // Update the displayed name if it changed
+            const fullNameDisplay = document.querySelector('[th\\:text="${fullName}"]');
+            if (fullNameDisplay) {
+                fullNameDisplay.textContent = data.fullName;
+            }
+        })
+        .catch(error => {
+            console.error('Update error:', error);
+            showMessage('Failed to update profile. Please try again.', 'error');
+        });
+    });
+
+    function getUserIdFromPage() {
+        // This would typically come from a hidden field or be extracted from the user object
+        // For now, we'll assume it's available in the user object
+        return /*[[${user.id}]]*/ 'user-id';
+    }
+
+    function showMessage(message, type) {
+        messageDiv.style.display = 'block';
+        messageDiv.className = 'alert alert-' + type;
+        messageDiv.textContent = message;
+
+        // Hide message after 5 seconds
+        setTimeout(() => {
+            messageDiv.style.display = 'none';
+        }, 5000);
+    }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+/* Admin Dashboard Charts CSS */
+canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 320px !important;
+  background: #fff !important;
+  border-radius: 10px !important;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}

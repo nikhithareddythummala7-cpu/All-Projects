@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Find Medicines - Medly Pharma</title>
+    <!-- CSRF Token -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <style>
+        .medicines-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .search-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .medicine-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .medicine-image-container {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .medicine-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            padding: 10px;
+        }
+        .medicine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .medicine-card .card-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .medicine-card .card-header h5 {
+            color: #1e293b;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        .medicine-card .medicine-info {
+            padding: 20px;
+        }
+        .medicine-card p {
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #475569;
+        }
+        .medicine-card .price {
+            font-size: 1.1rem;
+            color: #1e293b;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .medicine-card .action-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .medicine-card .buy-now {
+            padding: 8px 20px;
+            font-weight: 500;
+        }
+        .medicine-card .stock-info {
+            font-size: 13px;
+        }
+        .badge {
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            border-radius: 20px;
+        }
+        .medicine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .category-cards {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .category-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 140px;
+            height: 100px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: transform .15s ease, box-shadow .15s ease;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .category-card:hover, .category-card:focus {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            outline: none;
+        }
+
+        .category-icon {
+            font-size: 22px;
+            color: #0d6efd;
+            margin-bottom: 8px;
+        }
+
+        .category-name {
+            font-size: 0.95rem;
+            color: #283046;
+            font-weight: 600;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container medicines-container">
+        <h1>Find Medicines</h1>
+        <p>Browse our medicine catalog. Search medicines below.</p>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <h3>Search Medicines</h3>
+            <div class="row">
+                <div class="col-md-8">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Search by medicine name...">
+                </div>
+                <div class="col-md-4">
+                    <button id="searchBtn" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <select id="categoryFilter" class="form-control">
+                        <option value="">All Categories</option>
+                        <th:block th:each="category : ${categories}">
+                            <option th:value="${category}" th:text="${category}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="manufacturerFilter" class="form-control">
+                        <option value="">All Manufacturers</option>
+                        <th:block th:each="medicine : ${medicines}" th:with="manufacturer=${medicine.manufacturer}">
+                            <option th:value="${manufacturer}" th:text="${manufacturer}" 
+                                    th:unless="${manufacturer == null || #lists.contains(#vars.previousManufacturers ?: {}, manufacturer)}"
+                                    th:with="temp=${#vars.previousManufacturers?.add(manufacturer)}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select id="priceFilter" class="form-control">
+                        <option value="">All Prices</option>
+                        <option value="0-100">₹0 - ₹100</option>
+                        <option value="100-500">₹100 - ₹500</option>
+                        <option value="500-1000">₹500 - ₹1000</option>
+                        <option value="1000+">₹1000+</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+            <div id="medicinesList" class="medicine-grid">
+            <div th:if="${#lists.isEmpty(medicines)}" class="alert alert-info w-100">
+                <i class="bi bi-info-circle me-2"></i> No medicines found in the catalog.
+            </div>
+            
+            <th:block th:each="medicine : ${medicines}">
+                <div class="medicine-card">
+                    <!-- Medicine Image -->
+                    <div class="medicine-image-container" th:if="${medicine.imageUrl}">
+                        <img th:src="${medicine.imageUrl}" 
+                             th:alt="${medicine.name}" 
+                             class="medicine-image"
+                             onerror="this.onerror=null; this.src='/images/medicine-placeholder.jpg';">
+                    </div>
+                    <div class="card-header">
+                        <h5 th:text="${medicine.name}">Medicine Name</h5>
+                        <span th:class="'badge ' + ${medicine.quantityInStock > 0 ? 'bg-success' : 'bg-danger'} + ' ms-2'"
+                              th:text="${medicine.quantityInStock > 0 ? 'In Stock' : 'Out of Stock'}">
+                            Stock Status
+                        </span>
+                    </div>
+                    <div class="medicine-info">
+                        <p>
+                            <strong>Category:</strong> 
+                            <span th:text="${medicine.category}">Category</span>
+                        </p>
+                        <p>
+                            <strong>Manufacturer:</strong> 
+                            <span th:text="${medicine.manufacturer}">Manufacturer</span>
+                        </p>
+                        <p>
+                            <strong>Dosage:</strong> 
+                            <span th:text="${medicine.dosage}">Dosage</span>
+                        </p>
+                        <p th:if="${medicine.description}">
+                            <strong>Description:</strong> 
+                            <span th:text="${medicine.description}">Description</span>
+                        </p>
+                        <p class="price">
+                            <strong>Price:</strong> 
+                            <span th:text="'₹' + ${#numbers.formatDecimal(medicine.price, 1, 2)}">Price</span>
+                        </p>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-primary buy-now"
+                                    th:data-medicine-id="${medicine.id}"
+                                    th:data-medicine-name="${medicine.name}"
+                                    th:disabled="${medicine.quantityInStock <= 0}">
+                                <i class="bi bi-cart-plus"></i> Buy Now
+                            </button>
+                            <span class="stock-info text-muted" th:text="${medicine.quantityInStock} + ' units available'">
+                                Stock Count
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const medicinesList = document.getElementById('medicinesList');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const manufacturerFilter = document.getElementById('manufacturerFilter');
+    const priceFilter = document.getElementById('priceFilter');
+
+    let allMedicines = [];
+
+    // Load all medicines on page load
+    loadMedicines();
+
+    // Add event listeners for buy now buttons
+  document.addEventListener('click', function(e) {
+    const button = e.target.closest('.buy-now');
+    if (button) {
+        const medicineId = button.getAttribute('data-medicine-id');
+        const medicineName = button.getAttribute('data-medicine-name');
+        console.log('Buy Now button clicked:', { medicineId, medicineName });
+        if (medicineId && medicineName) {
+            addToCart(medicineId, medicineName);
+        }
+    }
+});
+
+
+    // Search functionality
+    searchBtn.addEventListener('click', function() {
+        applyFilters();
+    });
+
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            searchBtn.click();
+        }
+    });
+
+    // Filter functionality
+    categoryFilter.addEventListener('change', applyFilters);
+    manufacturerFilter.addEventListener('change', applyFilters);
+    priceFilter.addEventListener('change', applyFilters);
+
+    function loadMedicines() {
+        console.log('Starting to load medicines...');
+        medicinesList.innerHTML = '<div class="medicine-card"><h5><span class="spinner"></span>Loading medicines...</h5><p>Please wait while we fetch the latest medicine catalog.</p></div>';
+        fetch('/api/medicines')
+            .then(response => {
+                console.log('Fetch response received:', response.status);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch medicines. Status: ' + response.status + ', ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                if (!data || data.length === 0) {
+                    console.log('No medicines found in response');
+                    medicinesList.innerHTML = '<div class="medicine-card"><h5>No medicines available</h5><p>No medicines have been added to the catalog yet.</p></div>';
+                    return;
+                }
+                allMedicines = data;
+                console.log('Populating filters with', data.length, 'medicines');
+                populateFilters(data);
+                displayMedicines(data);
+            })
+            .catch(error => {
+                console.error('Error loading medicines:', error);
+                medicinesList.innerHTML = '<div class="medicine-card"><h5>Error loading medicines</h5><p>Unable to load medicines. Please refresh the page or try again later.</p><p class="text-muted">Error: ' + error.message + '</p></div>';
+            });
+    }
+
+    function populateFilters(medicines) {
+        const categories = [...new Set(medicines.map(m => m.category).filter(c => c))];
+        const manufacturers = [...new Set(medicines.map(m => m.manufacturer).filter(m => m))];
+
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat;
+            option.textContent = cat;
+            categoryFilter.appendChild(option);
+        });
+
+        manufacturers.forEach(man => {
+            const option = document.createElement('option');
+            option.value = man;
+            option.textContent = man;
+            manufacturerFilter.appendChild(option);
+        });
+        // Initialize category card handlers after filters populated
+        initCategoryCards();
+    }
+
+    function initCategoryCards() {
+        const cards = document.querySelectorAll('.category-card');
+        if (!cards) return;
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                const cat = card.dataset.category;
+                if (cat === 'All') {
+                    categoryFilter.value = '';
+                } else {
+                    categoryFilter.value = cat;
+                }
+                applyFilters();
+            });
+            card.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+    }
+
+   function applyFilters() {
+    let filtered = allMedicines;
+
+    // Search filter
+    const query = searchInput.value.trim().toLowerCase();
+    if (query) {
+        filtered = filtered.filter(medicine =>
+            medicine.name.toLowerCase().includes(query) ||
+            (medicine.description && medicine.description.toLowerCase().includes(query))
+        );
+    }
+
+    // Category filter (case-insensitive + partial match)
+    const category = categoryFilter.value.trim().toLowerCase();
+    if (category) {
+        filtered = filtered.filter(medicine => 
+            medicine.category && medicine.category.toLowerCase().includes(category)
+        );
+    }
+
+    // Manufacturer filter (case-insensitive + partial match)
+    const manufacturer = manufacturerFilter.value.trim().toLowerCase();
+    if (manufacturer) {
+        filtered = filtered.filter(medicine => 
+            medicine.manufacturer && medicine.manufacturer.toLowerCase().includes(manufacturer)
+        );
+    }
+
+    // Price filter (fixed logic)
+    const priceRange = priceFilter.value;
+    if (priceRange) {
+        filtered = filtered.filter(medicine => {
+            const price = parseFloat(medicine.price);
+            if (priceRange === "0-100") return price >= 0 && price <= 100;
+            if (priceRange === "100-500") return price > 100 && price <= 500;
+            if (priceRange === "500-1000") return price > 500 && price <= 1000;
+            if (priceRange === "1000+") return price > 1000;
+            return true;
+        });
+    }
+
+    displayMedicines(filtered);
+}
+
+
+    function displayMedicines(medicines) {
+        if (medicines.length === 0) {
+            medicinesList.innerHTML = '<div class="medicine-card"><h5>No medicines found</h5><p>No medicines match your search criteria.</p></div>';
+            return;
+        }
+
+        const html = medicines.map(medicine => `
+            <div class="medicine-card">
+                <div class="card-header">
+                    <h5>${medicine.name}</h5>
+                    <span class="badge ${medicine.quantityInStock > 0 ? 'bg-success' : 'bg-danger'} ms-2">
+                        ${medicine.quantityInStock > 0 ? 'In Stock' : 'Out of Stock'}
+                    </span>
+                </div>
+                <div class="medicine-info">
+                    ${medicine.imageUrl ? `<div style="text-align:center;margin-bottom:10px;"><img src="${medicine.imageUrl}" alt="${medicine.name}" style="max-width:120px;max-height:80px;object-fit:contain;"/></div>` : ''}
+                    <p><strong>Category:</strong> ${medicine.category || 'N/A'}</p>
+                    <p><strong>Manufacturer:</strong> ${medicine.manufacturer || 'N/A'}</p>
+                    <p><strong>Dosage:</strong> ${medicine.dosage || 'N/A'}</p>
+                    <p><strong>Description:</strong> ${medicine.description ? (medicine.description.length > 120 ? medicine.description.substring(0,120) + '...' : medicine.description) : 'N/A'}</p>
+                    <p class="price"><strong>Price:</strong> ₹${medicine.price || 'N/A'}</p>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary buy-now" data-medicine-id="${medicine.id}" data-medicine-name="${medicine.name.replace(/'/g, "\\'")}"
+                                ${medicine.quantityInStock <= 0 ? 'disabled' : ''}>
+                            <i class="bi bi-cart-plus"></i> Buy Now
+                        </button>
+                        <span class="stock-info text-muted">
+                            ${medicine.quantityInStock} units available
+                        </span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        medicinesList.innerHTML = html;
+    }
+
+    // Cart functionality
+    function addToCart(medicineId, medicineName) {
+        console.log('addToCart called with:', { medicineId, medicineName });
+        const medicine = allMedicines.find(m => m.id === medicineId);
+        if (!medicine) {
+            showToast('Error', 'Medicine not found', 'error');
+            return;
+        }
+
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const header = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+        console.log('CSRF token:', token, 'Header:', header);
+
+        fetch('/api/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [header]: token
+            },
+            body: JSON.stringify({
+                medicineId: medicineId,
+                quantity: 1
+            }),
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            console.log('API response status:', response.status);
+            if (!response.ok) {
+                if (response.status === 401) {
+                    throw new Error('Please log in to add items to cart');
+                } else if (response.status === 400) {
+                    return response.text().then(text => { throw new Error(text) });
+                } else {
+                    throw new Error('Failed to add item to cart');
+                }
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('API response data:', data);
+            showToast('Success', `${medicineName} added to cart!`, 'success');
+            updateCartBadge(data.totalItems);
+        })
+        .catch(error => {
+            console.error('Error adding to cart:', error);
+            showToast('Error', error.message || 'Failed to add item to cart. Please try again.', 'error');
+        });
+    }
+
+    // Toast notification system
+    function showToast(title, message, type = 'info') {
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+        const toast = document.createElement('div');
+        toast.className = `toast show alert alert-${type === 'error' ? 'danger' : 'success'}`;
+        toast.style.opacity = '1';
+        
+        toast.innerHTML = `
+            <div class="toast-header">
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+            <div class="toast-body">${message}</div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function createToastContainer() {
+        const container = document.createElement('div');
+        container.id = 'toast-container';
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        `;
+        document.body.appendChild(container);
+        return container;
+    }
+
+    function updateCartBadge(count) {
+        const badge = document.getElementById('cart-badge');
+        if (badge) {
+            badge.textContent = count;
+            badge.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+    }
+});
+</script>
+
+<!-- Add toast container styles -->
+<style>
+#toast-container .toast {
+    min-width: 250px;
+    transition: opacity 0.3s ease-in-out;
+    margin-bottom: 10px;
+}
+</style>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Medly Pharma - <th:block th:text="${title}">Home</th:block></title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <th:block th:replace="~{fragments/head :: head}"></th:block>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-pills me-2"></i>Medly Pharma
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/medicines}">Medicines</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/prescriptions}">Prescriptions</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" th:href="@{/admin/dashboard}">Admin Dashboard</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span sec:authentication="name">User</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" th:href="@{/profile}">Profile</a></li>
+                            <li><a class="dropdown-item" th:href="@{/orders}">My Orders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form th:action="@{/logout}" method="post" class="d-inline">
+                                    <button type="submit" class="dropdown-item">Logout</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-light ms-2">Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/login}">Login</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" th:href="@{/register}">Register</a>
+                    </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" th:href="@{/cart}">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-count" style="display: none;" id="cartCount">
+                                0
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container my-4">
+        <div th:if="${#bannerMessage}" class="alert alert-info" th:text="${#bannerMessage}"></div>
+        <div th:if="${#errorMessage}" class="alert alert-danger" th:text="${#errorMessage}"></div>
+        <div th:if="${#successMessage}" class="alert alert-success" th:text="${#successMessage}"></div>
+
+        <div layout:fragment="content">
+            <!-- Content will be inserted here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>About Medly Pharma</h5>
+                    <p>Your trusted online pharmacy for all your healthcare needs.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">About Us</a></li>
+                        <li><a href="#" class="text-white">Contact</a></li>
+                        <li><a href="#" class="text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-white">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Contact Us</h5>
+                    <address>
+                        123 Medicine St.<br>
+                        Health City, HC 12345<br>
+                        <i class="fas fa-phone me-2"></i> (123) 456-7890<br>
+                        <i class="fas fa-envelope me-2"></i> info@medlypharma.com
+                    </address>
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <p class="mb-0">&copy; 2023 Medly Pharma. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- jQuery (required for Bootstrap 5) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/cart-utils.js}"></script>
+    <script th:src="@{/js/main.js}" defer></script>
+    
+    <th:block th:replace="~{fragments/scripts :: scripts}"></th:block>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/layout}">
+<head>
+    <title th:text="${medicine.id} ? 'Edit Medicine' : 'Add New Medicine'">Add/Edit Medicine - Admin - Medly Pharma</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <th:block layout:fragment="styles">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css" />
+        <style>
+            .form-container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 2rem;
+                background: white;
+                border-radius: 0.5rem;
+                box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.05);
+            }
+            .form-header {
+                border-bottom: 1px solid #e9ecef;
+                padding-bottom: 1rem;
+                margin-bottom: 2rem;
+            }
+            .form-actions {
+                border-top: 1px solid #e9ecef;
+                padding-top: 1.5rem;
+                margin-top: 1.5rem;
+            }
+            .preview-image {
+                max-width: 200px;
+                max-height: 200px;
+                object-fit: contain;
+                border: 1px solid #dee2e6;
+                border-radius: 0.25rem;
+                padding: 0.5rem;
+                margin-bottom: 1rem;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="content" class="container-fluid py-4">
+        <div class="form-container">
+            <div class="form-header">
+                <h2 class="h4 mb-0" th:text="${medicine.id} ? 'Edit Medicine' : 'Add New Medicine'">Add/Edit Medicine</h2>
+                <p class="text-muted mb-0">Fill in the details below to add or update medicine information.</p>
+            </div>
+            
+            <!-- Success/Error Messages -->
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <span th:text="${successMessage}">Operation completed successfully</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span th:text="${errorMessage}">An error occurred</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            <form th:action="@{/admin/medicines/save}" th:object="${medicine}" method="post" class="needs-validation" novalidate>
+                <!-- Validation Message -->
+                <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                    <h5 class="alert-heading">Please fix the following errors:</h5>
+                    <ul class="mb-0">
+                        <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Error</li>
+                    </ul>
+                </div>
+
+                <!-- Only include ID field if it exists and is not empty -->
+                <input type="hidden" th:field="*{id}" th:if="${medicine.id != null and medicine.id != ''}" />
+                <input type="hidden" th:field="*{createdAt}" th:value="${medicine.createdAt}" />
+                <input type="hidden" th:field="*{updatedAt}" th:value="${medicine.updatedAt}" />
+                
+                <div class="row mb-4">
+                    <div class="col-md-8">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4">Basic Information</h5>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="name" class="form-label">Medicine Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="name" th:field="*{name}" 
+                                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                                            Please provide a valid medicine name.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="manufacturer" class="form-label">Manufacturer <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="manufacturer" th:field="*{manufacturer}" 
+                                               th:classappend="${#fields.hasErrors('manufacturer')} ? 'is-invalid' : ''"
+                                               required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('manufacturer')}" th:errors="*{manufacturer}">
+                                            Please provide the manufacturer name.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="category" th:field="*{category}" 
+                                                th:classappend="${#fields.hasErrors('category')} ? 'is-invalid' : ''"
+                                                required>
+                                            <option value="" disabled>Select a category</option>
+                                            <option th:each="cat : ${categories}" 
+                                                    th:value="${cat}" 
+                                                    th:text="${cat}"
+                                                    th:selected="${medicine.category == cat}">
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}" th:errors="*{category}">
+                                            Please select a valid category.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <label for="dosage" class="form-label">Dosage <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="dosage" th:field="*{dosage}" 
+                                               th:classappend="${#fields.hasErrors('dosage')} ? 'is-invalid' : ''"
+                                               placeholder="e.g., 500mg" required>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('dosage')}" th:errors="*{dosage}">
+                                            Please provide valid dosage information.
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12">
+                                        <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="description" th:field="*{description}" 
+                                                  th:classappend="${#fields.hasErrors('description')} ? 'is-invalid' : ''"
+                                                  rows="3" required></textarea>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">
+                                            Please provide a valid description.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4">Pricing & Stock</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="price" class="form-label">Price (₹) <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+                                        <input type="number" class="form-control" id="price" th:field="*{price}" 
+                                               th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
+                                               min="0.01" step="0.01" required>
+                                    </div>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">
+                                        Please provide a valid price (greater than 0).
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="quantityInStock" class="form-label">Quantity in Stock <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="quantityInStock" th:field="*{quantityInStock}" 
+                                           th:classappend="${#fields.hasErrors('quantityInStock')} ? 'is-invalid' : ''"
+                                           min="0" required>
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('quantityInStock')}" th:errors="*{quantityInStock}">
+                                        Please provide a valid quantity (0 or greater).
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="minimumStockLevel" class="form-label">Minimum Stock Level</label>
+                                    <input type="number" class="form-control" id="minimumStockLevel" th:field="*{minimumStockLevel}" 
+                                           th:classappend="${#fields.hasErrors('minimumStockLevel')} ? 'is-invalid' : ''"
+                                           min="0">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('minimumStockLevel')}" th:errors="*{minimumStockLevel}">
+                                        Please provide a valid minimum stock level (0 or greater).
+                                    </div>
+                                    <small class="text-muted">Low stock alert will be triggered when quantity falls below this number.</small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="expiryDate" class="form-label">Expiry Date</label>
+                                    <div class="input-group date" id="expiryDatePicker" data-target-input="nearest">
+                                        <input type="text" class="form-control datetimepicker-input" 
+                                               id="expiryDate" th:field="*{expiryDate}" 
+                                               th:classappend="${#fields.hasErrors('expiryDate')} ? 'is-invalid' : ''"
+                                               th:value="${medicine.expiryDate}"
+                                               data-target="#expiryDatePicker"
+                                               data-toggle="datetimepicker"
+                                               placeholder="YYYY-MM-DD"
+                                               required/>
+                                        <span class="input-group-text" data-target="#expiryDatePicker" data-toggle="datetimepicker">
+                                            <i class="fas fa-calendar"></i>
+                                        </span>
+                                        <div class="invalid-feedback" th:if="${#fields.hasErrors('expiryDate')}" th:errors="*{expiryDate}">
+                                            Please provide a valid future expiry date.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="imageUrl" class="form-label">Image URL</label>
+                                    <input type="text" class="form-control" id="imageUrl" th:field="*{imageUrl}" 
+                                           th:classappend="${#fields.hasErrors('imageUrl')} ? 'is-invalid' : ''"
+                                           placeholder="https://example.com/image.jpg">
+                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('imageUrl')}" th:errors="*{imageUrl}">
+                                        Please provide a valid image URL.
+                                    </div>
+                                    <div class="mt-2 text-center" th:if="${medicine.imageUrl != null and !#fields.hasErrors('imageUrl')}">
+                                        <img th:src="${medicine.imageUrl}" class="preview-image" alt="Medicine preview" onerror="this.style.display='none'">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions text-end">
+                    <a th:href="@{/admin/medicines}" class="btn btn-light me-2">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Medicine
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <!-- Moment.js for date handling -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        
+        <!-- Tempus Dominus Bootstrap 4 -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize date picker with min date set to tomorrow
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                
+                $('#expiryDatePicker').datetimepicker({
+                    format: 'YYYY-MM-DD',
+                    useCurrent: false,
+                    minDate: tomorrow,
+                    icons: {
+                        time: 'fas fa-clock',
+                        date: 'fas fa-calendar',
+                        up: 'fas fa-arrow-up',
+                        down: 'fas fa-arrow-down',
+                        previous: 'fas fa-chevron-left',
+                        next: 'fas fa-chevron-right',
+                        today: 'fas fa-calendar-check',
+                        clear: 'fas fa-trash',
+                        close: 'fas fa-times'
+                    }
+                });
+                
+                // Auto-format price input
+                document.getElementById('price')?.addEventListener('blur', function(e) {
+                    const value = parseFloat(this.value);
+                    if (!isNaN(value)) {
+                        this.value = value.toFixed(2);
+                    }
+                });
+                
+                // Show image preview when URL changes
+                document.getElementById('imageUrl')?.addEventListener('input', function(e) {
+                    const preview = this.closest('.mb-3').querySelector('.preview-image');
+                    if (preview && this.value) {
+                        preview.src = this.value;
+                        preview.style.display = 'block';
+                    } else if (preview) {
+                        preview.style.display = 'none';
+                    }
+                });
+                
+                // Form validation
+                (function () {
+                    'use strict';
+                    
+                    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                    const forms = document.querySelectorAll('form');
+                    
+                    // Loop over them and prevent submission
+                    Array.from(forms).forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                                if (!form.checkValidity()) {
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    
+                                    // Scroll to the first invalid field
+                                    const firstInvalid = form.querySelector(':invalid');
+                                    if (firstInvalid) {
+                                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        firstInvalid.focus();
+                                    }
+                                }
+                                
+                                form.classList.add('was-validated');
+                            }, { passive: false });
+                        });
+                })();
+                
+                // Show success/error messages with auto-dismiss
+                const alertList = document.querySelectorAll('.alert');
+                alertList.forEach(function (alert) {
+                    setTimeout(() => {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }, 5000);
+                });
+                
+                // Set focus to the first input field
+                const firstInput = document.querySelector('form input[type="text"]');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

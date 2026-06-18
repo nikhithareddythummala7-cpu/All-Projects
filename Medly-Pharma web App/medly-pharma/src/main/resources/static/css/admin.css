@@ -1,0 +1,242 @@
+/* Admin Layout */
+:root {
+    --sidebar-width: 250px;
+    --header-height: 60px;
+    --primary-color: #4e73df;
+    --secondary-color: #858796;
+    --success-color: #1cc88a;
+    --info-color: #36b9cc;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
+    --light-color: #f8f9fc;
+    --dark-color: #5a5c69;
+}
+
+/* Admin Container */
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--light-color);
+}
+
+/* Sidebar */
+.admin-sidebar {
+    width: var(--sidebar-width);
+    background: #fff;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1000;
+    transition: all 0.3s;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    padding: 1.5rem 1.5rem 0.5rem;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-header i {
+    font-size: 1.5rem;
+}
+
+.sidebar-menu {
+    padding: 1rem 0;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--primary-color);
+    background-color: rgba(78, 115, 223, 0.1);
+}
+
+.nav-link i {
+    width: 20px;
+    margin-right: 0.5rem;
+    text-align: center;
+}
+
+.sidebar-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    margin-top: auto;
+    font-size: 0.8rem;
+}
+
+/* Main Content */
+.admin-main {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    background-color: var(--light-color);
+}
+
+.admin-top-nav {
+    background-color: #fff;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.admin-content {
+    padding: 1.5rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: var(--dark-color);
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+/* Stats Cards */
+.stats-card {
+    border-left: 0.25rem solid;
+    border-radius: 0.35rem;
+    transition: transform 0.3s;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-card.primary {
+    border-left-color: var(--primary-color);
+}
+
+.stats-card.success {
+    border-left-color: var(--success-color);
+}
+
+.stats-card.warning {
+    border-left-color: var(--warning-color);
+}
+
+.stats-card.danger {
+    border-left-color: var(--danger-color);
+}
+
+.stats-card .card-body {
+    padding: 1.25rem;
+}
+
+.stats-card .stats-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark-color);
+}
+
+.stats-card .stats-label {
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--secondary-color);
+    letter-spacing: 0.1em;
+}
+
+.stats-card .stats-icon {
+    font-size: 2rem;
+    color: #dddfeb;
+}
+
+/* Tables */
+.table {
+    color: var(--dark-color);
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--secondary-color);
+    border-top: none;
+    padding: 0.75rem 1rem;
+    background-color: #f8f9fc;
+}
+
+.table td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+}
+
+/* Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .admin-sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .admin-sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .admin-main {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    .admin-sidebar.show + .admin-main {
+        margin-left: var(--sidebar-width);
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b7b9cc;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a1a3b7;
+}

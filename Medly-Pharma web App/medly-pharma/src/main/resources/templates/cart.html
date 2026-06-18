@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Shopping Cart - Medly Pharma</title>
+    <!-- CSRF tokens for AJAX requests -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+        <script th:inline="javascript">
+            // Initial cart data from server
+            window.initialCartData = {
+                items: /*[[${cartItems}]]*/ [],
+                totalAmount: /*[[${totalAmount}]]*/ 0,
+                deliveryCost: /*[[${deliveryCost}]]*/ 0,
+                totalWithDelivery: /*[[${totalWithDelivery}]]*/ 0
+            };
+        </script>
+        <script defer src="/js/main.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">Shopping Cart</h2>
+
+                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                <!-- Dynamic cart app (JS will populate) -->
+                <div id="cartPage">
+                    <div id="cartApp">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Medicine</th>
+                                                <th class="text-center">Qty</th>
+                                                <th class="text-end">Unit Price</th>
+                                                <th class="text-end">Total</th>
+                                                <th class="text-center">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="cartItemsTbody">
+                                            <!-- JS will render cart items here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Delivery Address</h5>
+                                        <form id="orderForm" class="needs-validation" novalidate>
+                                            <div class="mb-2">
+                                                <label for="fullName" class="form-label">Full Name</label>
+                                                <input type="text" id="fullName" name="fullName" class="form-control" required>
+                                                <div class="invalid-feedback">Please provide your full name.</div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label for="addressLine1" class="form-label">Address Line</label>
+                                                <input type="text" id="addressLine1" name="addressLine1" class="form-control" required>
+                                                <div class="invalid-feedback">Please provide address line 1.</div>
+                                            </div>
+                                           
+                                            <div class="row">
+                                                <div class="col-md-6 mb-2">
+                                                    <label for="city" class="form-label">City</label>
+                                                    <input type="text" id="city" name="city" class="form-control" required>
+                                                    <div class="invalid-feedback">Please provide a city.</div>
+                                                </div>
+                                                <div class="col-md-4 mb-2">
+                                                    <label for="state" class="form-label">State</label>
+                                                    <input type="text" id="state" name="state" class="form-control" required>
+                                                    <div class="invalid-feedback">Please provide a state.</div>
+                                                </div>
+                                                <div class="col-md-2 mb-2">
+                                                    <label for="pincode" class="form-label">Pincode</label>
+                                                    <input type="text" id="pincode" name="pincode" class="form-control" required>
+                                                    <div class="invalid-feedback">Please provide a pincode.</div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-2">
+                                                <label for="phone" class="form-label">Phone</label>
+                                                <input type="tel" id="phone" name="phone" class="form-control" required>
+                                                <div class="invalid-feedback">Please provide a phone number.</div>
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label">Payment Method</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="paymentMethod" id="card" value="Credit/Debit Card" required>
+                                                    <label class="form-check-label" for="card">
+                                                        Credit/Debit Card
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="paymentMethod" id="upi" value="UPI">
+                                                    <label class="form-check-label" for="upi">
+                                                        UPI
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="paymentMethod" id="cod" value="Cash on Delivery">
+                                                    <label class="form-check-label" for="cod">
+                                                        Cash on Delivery (COD)
+                                                    </label>
+                                                </div>
+                                                <div class="invalid-feedback">Please select a payment method.</div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h5 class="card-title">Order Summary</h5>
+                                        <p class="mb-1">Items Total: <strong id="itemsTotal">₹0.00</strong></p>
+                                        <p class="mb-1">Delivery: <strong id="deliveryCost">₹0.00</strong></p>
+                                        <h4 class="text-primary">Grand Total: <strong id="grandTotal">₹0.00</strong></h4>
+                                        <div class="mt-3 d-grid gap-2">
+                                            <button id="placeOrderBtn" type="button" class="btn btn-success btn-lg" onclick="console.log('✅ Place Order button clicked'); window.medlyPharma.placeOrder();">Place Order</button>
+                                            <a href="/medicines" class="btn btn-outline-secondary">Continue Shopping</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server-side fallback (non-JS) kept below for accessibility -->
+                <div th:if="${#lists.isEmpty(cartItems)}" class="text-center py-5 d-none" id="no-js-empty">
+                    <i class="fas fa-shopping-cart fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Your cart is empty</h4>
+                    <p class="text-muted">Add some medicines to your cart to get started.</p>
+                    <a href="/medicines" class="btn btn-primary">Browse Medicines</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- Handle cart functionality -->
+  <script>
+let orderProcessing = false;
+
+
+async function handlePlaceOrder(e) {
+    console.log('✅ Place Order button clicked');
+    e.preventDefault();
+    if (orderProcessing) return;
+    orderProcessing = true;
+
+    const button = e.target;
+    const originalText = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+
+    try {
+        const form = document.getElementById('orderForm');
+        if (!form) throw new Error('Order form not found');
+
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            throw new Error('Please fill in all required fields');
+        }
+
+        const formData = new FormData(form);
+        const addressData = {
+            fullName: formData.get('fullName'),
+            addressLine1: formData.get('addressLine1'),
+            city: formData.get('city'),
+            state: formData.get('state'),
+            pincode: formData.get('pincode'),
+            phone: formData.get('phone'),
+            paymentMethod: formData.get('paymentMethod')
+        };
+
+        if (!addressData.paymentMethod)
+            throw new Error('Please select a payment method');
+
+        const token = document.querySelector('meta[name="_csrf"]').content;
+        const header = document.querySelector('meta[name="_csrf_header"]').content;
+
+        const response = await fetch('/api/orders/place', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [header]: token
+            },
+            body: JSON.stringify(addressData)
+        });
+
+        if (!response.ok) {
+            const errData = await response.json().catch(() => ({}));
+            throw new Error(errData.message || errData.error || 'Failed to place order');
+        }
+
+        console.log('✅ Order placed successfully');
+        if (window.medlyPharma?.showToast) {
+            window.medlyPharma.showToast('Success', 'Order placed successfully!', 'success');
+        }
+        setTimeout(() => window.location.href = '/order-history', 1500);
+
+    } catch (error) {
+        console.error('❌ Place order error:', error);
+        if (window.medlyPharma?.showToast) {
+            window.medlyPharma.showToast('Error', error.message || 'Could not place order', 'error');
+        } else {
+            alert(error.message);
+        }
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalText;
+        orderProcessing = false;
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    // ✅ Load cart safely even if medlyPharma isn't ready yet
+    if (window.medlyPharma?.loadCartPage) {
+        window.medlyPharma.loadCartPage();
+    }
+    
+    // ✅ Ensure Place Order button gets listener
+    function setupPlaceOrderButton() {
+        const placeOrderBtn = document.getElementById('placeOrderBtn');
+        if (placeOrderBtn) {
+            // Remove any existing click handlers to prevent duplicates
+            const newBtn = placeOrderBtn.cloneNode(true);
+            placeOrderBtn.parentNode.replaceChild(newBtn, placeOrderBtn);
+            
+            // Add click handler
+            newBtn.addEventListener('click', function(e) {
+                console.log('✅ Place Order button clicked');
+                if (window.medlyPharma.placeOrder) {
+                    window.medlyPharma.placeOrder();
+                } else {
+                    console.error('placeOrder function not found on medlyPharma');
+                }
+            });
+            
+            console.log('✅ Place Order button initialized');
+        } else {
+            // Retry if button not found yet
+            setTimeout(setupPlaceOrderButton, 100);
+        }
+    }
+    
+    // Initial setup
+    setupPlaceOrderButton();
+});
+</script>
+
+</body>
+</html>

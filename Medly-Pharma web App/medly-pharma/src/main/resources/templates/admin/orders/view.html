@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/layout}">
+<head>
+    <title>Order Details - Admin Panel</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+        <h1 class="h2">Order Details</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a th:href="@{/admin/orders}" class="btn btn-sm btn-outline-secondary me-2">
+                <i class="bi bi-arrow-left"></i> Back to Orders
+            </a>
+        </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Order #<span th:text="${order.id}"></span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h6>Order Information</h6>
+                            <p class="mb-1">
+                                <strong>Date:</strong> 
+                                <span th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy HH:mm')}"></span>
+                            </p>
+                            <p class="mb-1">
+                                <strong>Status:</strong>
+                                <span class="badge" 
+                                      th:classappend="${'bg-' + (order.status.name() == 'ORDERED' ? 'warning' : 
+                                                               order.status.name() == 'PACKED' ? 'info' :
+                                                               order.status.name() == 'SHIPPED' ? 'primary' :
+                                                               order.status.name() == 'DELIVERED' ? 'success' :
+                                                               order.status.name() == 'CANCELLED' ? 'danger' : 'secondary')}">
+                                    <span th:text="${order.status}"></span>
+                                </span>
+                            </p>
+                            <p class="mb-1">
+                                <strong>Total:</strong> 
+                                <span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}"></span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Customer Information</h6>
+                            <p class="mb-1" th:text="${order.userEmail}"></p>
+                            <p class="mb-1" th:if="${order.shippingAddress != null}">
+                                <strong>Shipping Address:</strong><br>
+                                <span th:text="${order.shippingAddress}"></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <h6>Order Items</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="item : ${order.items}">
+                                <td th:text="${item.medicineName}">Product Name</td>
+                                <td th:text="${#numbers.formatDecimal(item.unitPrice, 1, 2)}">$0.00</td>
+                                <td th:text="${item.quantity}">1</td>
+                                <td th:text="${#numbers.formatDecimal(item.getTotalPrice(), 1, 2)}">$0.00</td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                                <td th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Shipping:</strong></td>
+                                <td>$0.00</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">$0.00</td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Actions -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Order Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/admin/orders/} + ${order.id} + '/status'" method="post" class="mb-3">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Update Status</label>
+                            <select name="status" id="status" class="form-select">
+                                <option th:each="status : ${T(com.example.medlypharma.model.Order.OrderStatus).values()}"
+                                        th:value="${status}"
+                                        th:text="${status}"
+                                        th:selected="${status == order.status}">
+                                </option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Update Status</button>
+                    </form>
+
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-secondary" onclick="alert('Print invoice functionality coming soon!'); return false;">
+                            <i class="bi bi-printer"></i> Print Invoice
+                        </a>
+                        <form th:action="@{'/admin/orders/' + ${order.id} + '/delete'}" method="post" class="d-grid"
+                              th:if="${order.status.name() != 'DELIVERED' && order.status.name() != 'CANCELLED'}"
+                              onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="bi bi-x-circle"></i> Cancel Order
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include any additional scripts here -->
+</body>
+</html>

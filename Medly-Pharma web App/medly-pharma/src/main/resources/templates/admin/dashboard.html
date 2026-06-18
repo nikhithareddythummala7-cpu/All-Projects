@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/layout}">
+<head>
+    <title>Dashboard - Admin - Medly Pharma</title>
+    <th:block layout:fragment="styles">
+        <style>
+            .stat-card {
+                border-left: 4px solid #4e73df;
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+                border-radius: 0.5rem;
+                margin-bottom: 1.5rem;
+            }
+            .stat-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+            }
+            .stat-card.primary { border-left-color: #4e73df; }
+            .stat-card.success { border-left-color: #1cc88a; }
+            .stat-card.warning { border-left-color: #f6c23e; }
+            .stat-card.danger { border-left-color: #e74a3b; }
+            
+            .stat-card .card-icon {
+                width: 3rem;
+                height: 3rem;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+            }
+            .stat-card.primary .card-icon { background-color: rgba(78, 115, 223, 0.1); color: #4e73df; }
+            .stat-card.success .card-icon { background-color: rgba(28, 200, 138, 0.1); color: #1cc88a; }
+            .stat-card.warning .card-icon { background-color: rgba(246, 194, 62, 0.1); color: #f6c23e; }
+            .stat-card.danger .card-icon { background-color: rgba(231, 74, 59, 0.1); color: #e74a3b; }
+            
+            .stat-value {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: #2d3748;
+                margin: 0.5rem 0;
+            }
+            .stat-label {
+                font-size: 0.875rem;
+                color: #718096;
+                margin-bottom: 0.25rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                font-weight: 600;
+            }
+            .stock-alert-item {
+                padding: 0.75rem 0;
+                border-bottom: 1px solid #edf2f7;
+            }
+            .stock-alert-item:last-child {
+                border-bottom: none;
+            }
+        </style>
+    </th:block>
+    <th:block layout:fragment="styles">
+        <style>
+            .hover-scale {
+                transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            }
+            .hover-scale:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+            }
+            .card {
+                border: none;
+                border-radius: 0.75rem;
+                box-shadow: 0 0.125rem 0.375rem rgba(0, 0, 0, 0.05);
+                transition: all 0.2s ease-in-out;
+            }
+            .card:hover {
+                box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+            }
+            .stat-card {
+                border-left: 4px solid #4e73df;
+            }
+            .stat-card.primary { border-left-color: #4e73df; }
+            .stat-card.success { border-left-color: #1cc88a; }
+            .stat-card.warning { border-left-color: #f6c23e; }
+            .stat-card.danger { border-left-color: #e74a3b; }
+            
+            .stat-card .card-icon {
+                width: 3rem;
+                height: 3rem;
+                border-radius: 0.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+            }
+            .stat-card.primary .card-icon { background-color: rgba(78, 115, 223, 0.1); color: #4e73df; }
+            .stat-card.success .card-icon { background-color: rgba(28, 200, 138, 0.1); color: #1cc88a; }
+            .stat-card.warning .card-icon { background-color: rgba(246, 194, 62, 0.1); color: #f6c23e; }
+            .stat-card.danger .card-icon { background-color: rgba(231, 74, 59, 0.1); color: #e74a3b; }
+            
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #2d3748;
+                margin: 0.5rem 0;
+            }
+            .stat-label {
+                font-size: 0.875rem;
+                color: #718096;
+                margin-bottom: 0.25rem;
+            }
+            .stat-change {
+                display: flex;
+                align-items: center;
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+            .stat-change.increase {
+                color: #1cc88a;
+            }
+            .stat-change.decrease {
+                color: #e74a3b;
+            }
+            .chart-container {
+                position: relative;
+                height: 300px;
+                width: 100%;
+            }
+            .order-status-badge {
+                padding: 0.35em 0.65em;
+                font-size: 0.75em;
+                font-weight: 700;
+                line-height: 1;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: 0.25rem;
+            }
+            .status-pending { background-color: #fff3cd; color: #856404; }
+            .status-processing { background-color: #cce5ff; color: #004085; }
+            .status-completed { background-color: #d4edda; color: #155724; }
+            .status-cancelled { background-color: #f8d7da; color: #721c24; }
+            .stat-change {
+                font-size: 0.75rem;
+                display: flex;
+                align-items: center;
+            }
+            .table th {
+                font-weight: 600;
+                color: #4a5568;
+                text-transform: uppercase;
+                font-size: 0.7rem;
+                letter-spacing: 0.05em;
+                border-top: none;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+                background-color: #f8fafc;
+            }
+            .table td {
+                vertical-align: middle;
+                padding: 1rem 0.75rem;
+                border-color: #edf2f7;
+            }
+            .table-hover tbody tr:hover {
+                background-color: #f8fafc;
+            }
+            .badge {
+                font-weight: 500;
+                padding: 0.35em 0.65em;
+                font-size: 0.75em;
+                border-radius: 0.25rem;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div layout:fragment="admin-content" class="container-fluid px-4 py-4">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Dashboard</h1>
+            <div class="text-muted small">
+                <i class="far fa-calendar-alt me-1"></i>
+                <span th:text="${#temporals.format(#temporals.createNow(), 'EEEE, MMMM d, yyyy')}">Monday, January 1, 2023</span>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Total Users -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card primary h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div>
+                                <div class="stat-label">Total Users</div>
+                                <div class="stat-value" th:text="${totalUsers}">0</div>
+                                <div class="stat-change text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                    <span th:text="${userGrowth} + '% from last month'">0% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Orders -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card success h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div>
+                                <div class="stat-label">Total Orders</div>
+                                <div class="stat-value" th:text="${totalOrders}">0</div>
+                                <div class="stat-change text-success" th:classappend="${orderGrowth < 0} ? 'text-danger' : 'text-success'">
+                                    <i th:class="${orderGrowth >= 0} ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="me-1"></i>
+                                    <span th:text="${orderGrowth} + '% from last month'">0% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Revenue -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card warning h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <div>
+                                <div class="stat-label">Total Revenue</div>
+                                <div class="stat-value" th:text="${'₹' + #numbers.formatDecimal(totalRevenue, 1, 'COMMA', 2, 'POINT')}">₹0.00</div>
+                                <div class="stat-change text-success" th:classappend="${revenueGrowth < 0} ? 'text-danger' : 'text-success'">
+                                    <i th:class="${revenueGrowth >= 0} ? 'fas fa-arrow-up' : 'fas fa-arrow-down'" class="me-1"></i>
+                                    <span th:text="${revenueGrowth} + '% from last month'">0% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stock Alerts -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card danger h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div>
+                                <div class="stat-label">Stock Alerts</div>
+                                <div class="stat-value" th:text="${lowStockCount}">0</div>
+                                <div class="stat-change">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <span>Items below minimum stock</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Alerts Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Low Stock Items</h5>
+                        <a th:if="${lowStockCount > 0}" href="#" class="btn btn-sm btn-outline-danger" th:onclick="updateAllStock()">
+                            <i class="fas fa-sync-alt me-1"></i> Update All
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${lowStockItems != null && !lowStockItems.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Medicine</th>
+                                            <th>Current Stock</th>
+                                            <th>Minimum Required</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="item : ${lowStockItems}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img th:if="${item.imageUrl}" 
+                                                         th:src="${item.imageUrl}" 
+                                                         class="rounded me-3" 
+                                                         style="width: 40px; height: 40px; object-fit: cover;"
+                                                         onerror="this.onerror=null; this.src='/images/medicine-placeholder.jpg'"
+                                                         alt="Medicine">
+                                                    <div>
+                                                        <div class="fw-bold" th:text="${item.name}">Medicine Name</div>
+                                                        <div class="text-muted small" th:text="${item.manufacturer}">Manufacturer</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td th:text="${item.quantityInStock}" class="fw-bold">0</td>
+                                            <td th:text="${item.minimumStockLevel}">0</td>
+                                            <td>
+                                                <span class="badge bg-warning" th:if="${item.quantityInStock > 0}">Low Stock</span>
+                                                <span class="badge bg-danger" th:if="${item.quantityInStock == 0}">Out of Stock</span>
+                                            </td>
+                                            <td>
+                                                <a th:href="@{/admin/medicines/} + ${item.id} + '/edit'" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-edit me-1"></i> Update
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:if="${lowStockItems == null || lowStockItems.isEmpty()}" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                                <h5>No Stock Alerts</h5>
+                                <p class="mb-0">All items are well stocked.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            function updateAllStock() {
+                if (confirm('Are you sure you want to update stock for all low stock items?')) {
+                    // Implement stock update logic here
+                    alert('Stock update functionality will be implemented here.');
+                }
+            }
+        </script>
+    </th:block>
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span th:text="${error}">Error message</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">Dashboard</h1>
+                <p class="text-muted mb-0">Welcome back! Here's what's happening with your store today.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/admin/orders/new}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>New Order
+                </a>
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-download me-2"></i>Export
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2 text-danger"></i>PDF</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2 text-success"></i>Excel</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-csv me-2 text-primary"></i>CSV</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <!-- Total Orders -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card primary h-100 hover-scale">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-shopping-cart"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="stat-label">Total Orders</div>
+                                <div class="stat-value" th:text="${totalOrders}">0</div>
+                                <div class="stat-change text-primary">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                    <span>12% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Users -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card success h-100 hover-scale">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="stat-label">Total Users</div>
+                                <div class="stat-value" th:text="${totalUsers}">0</div>
+                                <div class="stat-change text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                    <span>5 new this week</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Products -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card warning h-100 hover-scale">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-pills"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="stat-label">Total Products</div>
+                                <div class="stat-value" th:text="${totalProducts}">0</div>
+                                <div class="stat-change" th:classappend="${lowStockItems != null && !lowStockItems.isEmpty()} ? 'text-danger' : 'text-success'">
+                                    <i th:classappend="${lowStockItems != null && !lowStockItems.isEmpty()} ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'"></i>
+                                    <span th:if="${lowStockItems != null && !lowStockItems.isEmpty()}" class="ms-1">
+                                        <span th:text="${#lists.size(lowStockItems)}">0</span> low in stock
+                                    </span>
+                                    <span th:if="${lowStockItems == null || lowStockItems.isEmpty()}" class="ms-1">
+                                        All products in stock
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monthly Revenue -->
+            <div class="col-xl-3 col-md-6">
+                <div class="card stat-card danger h-100 hover-scale">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="card-icon me-3">
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="stat-label">Monthly Revenue</div>
+                                <div class="stat-value">$<span th:with="total=${#maps.isEmpty(revenueByMonth) ? 0 : #aggregates.sum(revenueByMonth.values())}" 
+                                     th:text="${#numbers.formatDecimal(total, 1, 2)}">0.00</span></div>
+                                <div class="stat-change text-success">
+                                    <i class="fas fa-arrow-up me-1"></i>
+                                    <span>8.2% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+       
+        
+        <!-- Content Row -->
+ <div class="row g-4">
+            <!-- Recent Orders -->
+            <div class="col-lg-8">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center justify-content-between py-3">
+                        <h5 class="mb-0">Recent Orders</h5>
+                        <a th:href="@{/admin/orders}" class="btn btn-sm btn-outline-primary">
+                            View All <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(recentOrders)}">
+                                        <td colspan="6" class="text-center py-4">
+                                            <div class="text-muted">No recent orders found</div>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="order : ${recentOrders}" class="align-middle">
+                                        <td class="text-primary fw-bold" th:text="'#' + order.id">#12345</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-2">
+                                                    <div class="avatar-title bg-light rounded-circle text-primary">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div th:text="${order.userEmail}">User Email</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td th:text="${#temporals.format(order.orderDate, 'MMM d, yyyy')}">Jan 1, 2023</td>
+                                        <td class="fw-bold" th:text="${'$' + #numbers.formatDecimal(order.totalAmount, 1, 2)}">$99.99</td>
+                                        <td>
+                                            <span class="badge" 
+                                                  th:classappend="${'bg-' + (order.status.name() == 'ORDERED' ? 'warning' : 
+                                                                   order.status.name() == 'PACKED' ? 'info' :
+                                                                   order.status.name() == 'SHIPPED' ? 'primary' :
+                                                                   order.status.name() == 'DELIVERED' ? 'success' :
+                                                                   order.status.name() == 'CANCELLED' ? 'danger' : 'secondary')}">
+                                                <span th:text="${order.status}"></span>
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a th:href="@{/admin/orders/{id}(id=${order.id})}" 
+                                               class="btn btn-sm btn-icon btn-light rounded-circle"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               title="View Order">
+                                                <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Low Stock Items -->
+            <div class="col-lg-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center justify-content-between py-3">
+                        <h5 class="mb-0">Low Stock Items</h5>
+                        <a th:href="@{/admin/medicines(stock='low')}" class="btn btn-sm btn-outline-warning">
+                            View All
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Stock</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:if="${#lists.isEmpty(lowStockItems)}">
+                                        <td colspan="3" class="text-center py-4">
+                                            <div class="text-muted">No low stock items</div>
+                                        </td>
+                                    </tr>
+                                    <tr th:each="item : ${lowStockItems}">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-sm me-3">
+                                                    <img th:if="${item.imageUrl != null}" 
+                                                         th:src="${item.imageUrl}" 
+                                                         class="img-fluid rounded" 
+                                                         style="width: 40px; height: 40px; object-fit: cover;"
+                                                         alt="Product Image">
+                                                    <div th:unless="${item.imageUrl != null}" 
+                                                         class="avatar-title bg-light rounded text-primary"
+                                                         style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                        <i class="fas fa-pills"></i>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-bold" th:text="${item.name}">Product Name</div>
+                                                    <small class="text-muted" th:text="${item.manufacturer}">Manufacturer</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 6px; width: 60px;">
+                                                    <div class="progress-bar bg-danger" role="progressbar" 
+                                                         th:style="'width: ' + ${item.quantityInStock} + '%'"
+                                                         aria-valuenow="${item.quantityInStock}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted" th:text="${item.quantityInStock} + '%'">25%</small>
+                                            </div>
+                                        </td>
+                                        <td class="text-end">
+                                            <a th:href="@{/admin/medicines/{id}/edit(id=${item.id})}" 
+                                               class="btn btn-sm btn-icon btn-light rounded-circle"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               title="Update Stock">
+                                                <i class="fas fa-edit text-warning"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                        </div>
+                        <a th:href="@{/admin/medicines(stock='low')}" class="btn btn-sm btn-warning w-100 mt-2">
+                            View All Low Stock Items
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/admin/medicines/new}" class="btn btn-primary">
+                                <i class="fas fa-plus me-1"></i> Add New Medicine
+                            </a>
+                            <a th:href="@{/admin/orders/new}" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i> Create Order
+                            </a>
+                            <a th:href="@{/admin/users/new}" class="btn btn-info text-white">
+                                <i class="fas fa-user-plus me-1"></i> Add New User
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Charts JavaScript -->
+    <th:block layout:fragment="scripts">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script th:src="@{/js/admin-dashboard-charts-fixed.js}"></script>
+    </th:block>
+</body>
+</html>

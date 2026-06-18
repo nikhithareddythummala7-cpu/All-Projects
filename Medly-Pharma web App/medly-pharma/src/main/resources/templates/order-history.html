@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <title>Order History - Medly Pharma</title>
+    <style>
+        .orders-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        .order-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-processing { background: #cce5ff; color: #004085; }
+        .status-shipped { background: #d1ecf1; color: #0c5460; }
+        .status-delivered { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .order-items {
+            margin-top: 15px;
+        }
+        .order-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .no-orders {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container orders-container">
+        <h1>Order History</h1>
+        <p>Welcome, <span th:text="${fullName}">User</span>! Here are your previous orders and prescriptions.</p>
+
+        <div th:if="${orders != null and !orders.isEmpty()}" class="orders-list">
+            <div th:each="order : ${orders}" class="order-card">
+                <div class="order-header">
+                    <div>
+                        <h5>Order #<span th:text="${order.orderNumber}">ORD-001</span></h5>
+                        <small class="text-muted">Ordered on <span th:text="${#temporals.format(order.orderDate, 'MMM dd, yyyy')}">Jan 01, 2024</span></small>
+                    </div>
+                    <div>
+                        <span class="order-status" th:class="${'order-status ' + (order.status.name().toLowerCase() == 'pending' ? 'status-pending' : order.status.name().toLowerCase() == 'processing' ? 'status-processing' : order.status.name().toLowerCase() == 'shipped' ? 'status-shipped' : order.status.name().toLowerCase() == 'delivered' ? 'status-delivered' : 'status-cancelled')}"
+                             th:text="${order.status.name()}">PENDING</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="order-items">
+                            <h6>Items:</h6>
+                            <div th:each="item : ${order.items}" class="order-item">
+                                <div>
+                                    <strong th:text="${item.medicineName}">Medicine Name</strong>
+                                    <span class="text-muted"> (Qty: <span th:text="${item.quantity}">1</span>)</span>
+                                </div>
+                                <div>
+                                    $<span th:text="${#numbers.formatDecimal(item.totalPrice, 1, 2)}">0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-right">
+                            <p><strong>Total: $<span th:text="${#numbers.formatDecimal(order.totalAmount, 1, 2)}">0.00</span></strong></p>
+                            <p class="mb-0"><small>Shipping: <span th:text="${order.shippingAddress}">Address</span></small></p>
+                            <p class="mb-0"><small>Payment: <span th:text="${order.paymentMethod}">Method</span></small></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button class="btn btn-outline-primary btn-sm">View Details</button>
+                    <button class="btn btn-outline-secondary btn-sm ml-2">Reorder</button>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${orders == null or orders.isEmpty()}" class="no-orders">
+            <i class="fas fa-shopping-cart" style="font-size: 4rem; color: #ccc; margin-bottom: 20px;"></i>
+            <h4>No Orders Yet</h4>
+            <p>You haven't placed any orders yet. Start by browsing our medicine catalog!</p>
+            <a href="/medicines" class="btn btn-primary">Browse Medicines</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

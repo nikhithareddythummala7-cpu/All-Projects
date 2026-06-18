@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Medly Pharma - System Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test API Endpoint</h2>
+        <button id="testApi">Test /api/test</button>
+        <div id="apiResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test MongoDB Connection</h2>
+        <button id="testMongo">Test MongoDB</button>
+        <div id="mongoResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Static Resources</h2>
+        <p>If you can see this text, static resources are loading correctly.</p>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Test API endpoint
+            $("#testApi").click(function() {
+                $.get("/api/test")
+                    .done(function(data) {
+                        $("#apiResult").html('<span class="success">Success: ' + data + '</span>');
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        $("#apiResult").html('<span class="error">Error: ' + textStatus + ' - ' + errorThrown + '</span>');
+                    });
+            });
+
+            // Test MongoDB connection
+            $("#testMongo").click(function() {
+                $.get("/health")
+                    .done(function(data) {
+                        $("#mongoResult").html('<span class="success">Success: ' + data + '</span>');
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        $("#mongoResult").html('<span class="error">Error: ' + textStatus + ' - ' + errorThrown + '</span>');
+                    });
+            });
+        });
+    </script>
+</body>
+</html>

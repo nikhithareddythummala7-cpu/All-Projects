@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/fragments/layout}">
+<head>
+    <title th:text="${user.id} ? 'Edit User' : 'Add New User'">User Form - Admin - Medly Pharma</title>
+</head>
+<body>
+    <div layout:fragment="admin-content">
+        <!-- Page Heading -->
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800" th:text="${user.id} ? 'Edit User' : 'Add New User'">
+                Add New User
+            </h1>
+            <a th:href="@{/admin/users}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Users
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Basic Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">User Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/admin/users/save}" method="post" th:object="${user}" class="needs-validation" novalidate>
+                            <input type="hidden" th:field="*{id}" />
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a first name.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+                                    <div class="invalid-feedback">
+                                        Please provide a last name.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email.
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">@</span>
+                                        <input type="text" class="form-control" id="username" th:field="*{username}" required>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Please choose a username.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="phone" class="form-label">Phone</label>
+                                    <input type="tel" class="form-control" id="phone" th:field="*{phone}">
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">
+                                        Password <span class="text-muted" th:if="${user.id}">(Leave blank to keep current)</span>
+                                    </label>
+                                    <input type="password" class="form-control" id="password" th:field="*{password}" 
+                                           th:required="${!user.id}" th:attr="data-required=${!user.id}">
+                                    <div class="invalid-feedback">
+                                        Please provide a password.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                    <input type="password" class="form-control" id="confirmPassword" 
+                                           th:required="${!user.id}">
+                                    <div class="invalid-feedback">
+                                        Passwords must match.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enabled" th:field="*{enabled}">
+                                    <label class="form-check-label" for="enabled">
+                                        Account Enabled
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    Disabled users cannot log in to the system.
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a th:href="@{/admin/users}" class="btn btn-secondary me-md-2">
+                                    <i class="fas fa-times me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Save User
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <!-- Role Card -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">User Role</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Select Role</label>
+                            <div class="list-group">
+                                <label class="list-group-item">
+                                    <input class="form-check-input me-2" type="radio" name="role" 
+                                           th:value="USER" th:field="*{role}">
+                                    Regular User
+                                    <small class="d-block text-muted">Can browse and purchase products</small>
+                                </label>
+                                <label class="list-group-item">
+                                    <input class="form-check-input me-2" type="radio" name="role" 
+                                           th:value="STAFF" th:field="*{role}">
+                                    Staff
+                                    <small class="d-block text-muted">Can manage products and orders</small>
+                                </label>
+                                <label class="list-group-item">
+                                    <input class="form-check-input me-2" type="radio" name="role" 
+                                           th:value="ADMIN" th:field="*{role}">
+                                    Administrator
+                                    <small class="d-block text-muted">Full system access</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- User Avatar -->
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3">
+                        <h6 class="m-0 font-weight-bold text-primary">Profile Picture</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <img th:src="${user.avatarUrl} ?: '/img/default-avatar.png'" 
+                             class="rounded-circle mb-3" width="150" height="150" alt="User Avatar" id="avatarPreview">
+                        <div class="d-grid">
+                            <input type="file" class="form-control" id="avatarUpload" accept="image/*">
+                            <div class="form-text">
+                                JPG, GIF or PNG. Max size 2MB
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block layout:fragment="scripts">
+        <script>
+            // Form validation
+            (function () {
+                'use strict'
+                
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.querySelectorAll('.needs-validation')
+                
+                // Loop over them and prevent submission
+                Array.prototype.slice.call(forms)
+                    .forEach(function (form) {
+                        form.addEventListener('submit', function (event) {
+                            // Check if passwords match
+                            const password = document.getElementById('password');
+                            const confirmPassword = document.getElementById('confirmPassword');
+                            const isRequired = password.getAttribute('data-required') === 'true';
+                            
+                            if (isRequired && password.value) {
+                                if (password.value !== confirmPassword.value) {
+                                    confirmPassword.setCustomValidity("Passwords must match");
+                                    confirmPassword.reportValidity();
+                                    event.preventDefault();
+                                    event.stopPropagation();
+                                    return;
+                                } else {
+                                    confirmPassword.setCustomValidity("");
+                                }
+                            }
+                            
+                            if (!form.checkValidity()) {
+                                event.preventDefault()
+                                event.stopPropagation()
+                            }
+                            
+                            form.classList.add('was-validated')
+                        }, false)
+                    })
+            })()
+            
+            // Avatar preview
+            document.getElementById('avatarUpload').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById('avatarPreview').src = e.target.result;
+                        // Here you would typically upload the file to your server
+                        // and update the user's avatar URL
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        </script>
+    </th:block>
+</body>
+</html>

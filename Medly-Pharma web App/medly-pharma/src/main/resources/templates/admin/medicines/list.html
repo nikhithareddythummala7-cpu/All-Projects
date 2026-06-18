@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicines - Admin Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Medicines</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <a th:href="@{/admin/medicines/new}" class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-plus-circle"></i> Add New Medicine
+            </a>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form th:action="@{/admin/medicines}" method="get" class="row g-3">
+                <div class="col-md-8">
+                    <input type="text" class="form-control" name="keyword" th:value="${keyword}" 
+                           placeholder="Search by name or manufacturer...">
+                </div>
+                <div class="col-md-2">
+                    <select name="category" class="form-select">
+                        <option value="">All Categories</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat}"
+                                th:text="${cat}"
+                                th:selected="${cat == selectedCategory}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Search
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Medicines Table -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Medicines List</h5>
+                <a th:href="@{/admin/medicines/new}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Add New Medicine
+                </a>
+            </div>
+            
+            <div th:if="${#lists.isEmpty(medicines)}" class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i> No medicines found.
+            </div>
+            
+            <div th:if="${!#lists.isEmpty(medicines)}" class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Manufacturer</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="medicine : ${medicines}" th:if="${medicine != null and medicine.id != null and medicine.id != ''}">
+                        <td th:text="${medicine.id}">ID</td>
+                        <td>
+                            <a th:href="@{/admin/medicines/{id}(id=${medicine.id})}" class="text-decoration-none">
+                                <span th:text="${medicine.name}">Medicine Name</span>
+                                <span th:if="${medicine.quantityInStock <= medicine.minimumStockLevel}" 
+                                      class="badge bg-warning text-dark ms-2">
+                                    Low Stock
+                                </span>
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary" th:text="${medicine.category}">Category</span>
+                        </td>
+                        <td>₹<span th:text="${#numbers.formatDecimal(medicine.price, 1, 2)}">0.00</span></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-2" style="height: 6px;">
+                                    <div class="progress-bar" 
+                                         th:classappend="${medicine.quantityInStock > medicine.minimumStockLevel} ? 'bg-success' : 'bg-danger'"
+                                         role="progressbar" 
+                                         th:style="'width: ' + ${medicine.quantityInStock > 0 ? (medicine.quantityInStock * 100 / (medicine.minimumStockLevel * 2)) : 0} + '%'"
+                                         th:aria-valuenow="${medicine.quantityInStock}"
+                                         aria-valuemin="0" 
+                                         th:aria-valuemax="${medicine.minimumStockLevel * 2}">
+                                    </div>
+                                </div>
+                                <span th:class="${medicine.quantityInStock > medicine.minimumStockLevel} ? 'text-success' : 'text-danger'"
+                                      th:text="${medicine.quantityInStock} + ' in stock'"
+                                      style="min-width: 80px; display: inline-block;">
+                                    0 in stock
+                                </span>
+                            </div>
+                        </td>
+                        <td th:text="${medicine.manufacturer}">Manufacturer</td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a th:href="@{/admin/medicines/edit/{id}(id=${medicine.id})}" 
+                                   class="btn btn-outline-primary"
+                                   data-bs-toggle="tooltip"
+                                   data-bs-placement="top"
+                                   title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- Delete button -->
+                                <button type="button" 
+                                        class="btn btn-outline-danger btn-sm delete-medicine"
+                                        th:if="${medicine.id != null and medicine.id != ''}"
+                                        th:data-medicine-id="${medicine.id}"
+                                        th:disabled="${medicine.id == null or medicine.id == ''}"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:if="${medicines.empty}">
+                        <td colspan="7" class="text-center">No medicines found</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <nav th:if="${totalPages > 1}" aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" 
+                           th:href="@{/admin/medicines(page=${currentPage - 1}, keyword=${keyword}, category=${selectedCategory})}" 
+                           th:if="${currentPage > 1}">Previous</a>
+                        <span class="page-link" th:unless="${currentPage > 1}">Previous</span>
+                    </li>
+                    
+                    <li th:each="page : ${pageNumbers}" class="page-item" th:classappend="${page == currentPage} ? 'active'">
+                        <a class="page-link" 
+                           th:href="@{/admin/medicines(page=${page}, keyword=${keyword}, category=${selectedCategory})}" 
+                           th:text="${page}">1</a>
+                    </li>
+                    
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" 
+                           th:href="@{/admin/medicines(page=${currentPage + 1}, keyword=${keyword}, category=${selectedCategory})}"
+                           th:if="${currentPage < totalPages}">Next</a>
+                        <span class="page-link" th:unless="${currentPage < totalPages}">Next</span>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="deleteModalBody">
+                Are you sure you want to delete this item?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a id="deleteButton" href="#" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('deleteModal');
+        const modalBody = document.getElementById('deleteModalBody');
+        const deleteButton = document.getElementById('deleteButton');
+        const contextPath = /*[[@{/}]]*/ '';
+        
+        // Add click handlers to all delete buttons
+        document.querySelectorAll('.delete-medicine').forEach(button => {
+            button.addEventListener('click', function() {
+                const medicineId = this.getAttribute('data-medicine-id');
+                
+                // Validate medicine ID
+                if (!medicineId || medicineId === 'null' || medicineId.trim() === '') {
+                    console.error('Invalid medicine ID');
+                    return;
+                }
+                
+                modalBody.textContent = 'Are you sure you want to delete this medicine?';
+                
+                // Update delete button action
+                deleteButton.onclick = function(e) {
+                    e.preventDefault();
+                    
+                    // Double-check ID validity before submission
+                    if (!medicineId || medicineId === 'null' || medicineId.trim() === '') {
+                        console.error('Invalid medicine ID');
+                        return;
+                    }
+                    
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = contextPath + 'admin/medicines/' + medicineId + '/delete';
+                    document.body.appendChild(form);
+                    form.submit();
+                };
+                
+                new bootstrap.Modal(modal).show();
+            });
+        });
+    });
+</script>
+</body>
+</html>
